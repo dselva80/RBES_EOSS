@@ -1,0 +1,190 @@
+;(require* templates "C:\\Users\\dani\\Documents\\My Dropbox\\Marc - Dani\\SCAN\\clp\\templates.clp")
+;(require* more-templates "C:\\Users\\dani\\Documents\\My Dropbox\\Marc - Dani\\SCAN\\clp\\more_templates.clp")
+;(require* functions "C:\\Users\\dani\\Documents\\My Dropbox\\Marc - Dani\\SCAN\\clp\\functions.clp")
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; RELAYS
+(defrule MANIFEST::fillout-constellations-names-in-arch
+    (declare (salience 10))
+    ?arch<- (MANIFEST::ARCHITECTURE (num-constel ?n&~nil) (constellations $?empty&:(eq (length$ $?empty) 0)))
+    =>
+    (bind ?const (create$ ))
+    (for (bind ?i 1) (<= ?i ?n) (++ ?i) (bind ?const (append$ ?const (str-cat "cons-" ?i))))
+    (modify ?arch (constellations ?const))
+    )
+
+
+(defrule MANIFEST::assert-constellations-from-arch
+    (declare (salience 10))
+    (MANIFEST::ARCHITECTURE (payloads $?payls) (payload-allocation $?pack) (num-constel ?n) (lifetime ?life)
+        (num-planes $?np) (num-sats-per-plane $?ns) (orbits $?orbs) (contract-modalities $?contracts)
+        (isl-payloads $?isl-p) (icl-payloads ?icl-p) (gs-payloads $?gs-p)
+        (isl-payload-allocation $?isl-a) (icl-payload-allocation ?icl-a) (gs-payload-allocation $?gs-a))
+    (test (eq (length$ $?isl-a) ?n))
+    (test (eq (length$ $?gs-a) (length$ $?gs-p)))
+    =>
+    (if (eq ?icl-a 1) then (bind ?icl-payl ?icl-p) else (bind ?icl-payl nil)); same for all constellations
+    (for (bind ?i 1) (<= ?i ?n) (++ ?i)
+        (bind ?isl-payl (nth$ (nth$ ?i $?isl-a) ?isl-p))
+        (bind ?gs-payl (get-elems-bin$ (dec2bin (nth$ ?i $?gs-a) (length$ $?gs-p)) $?gs-p))
+        (printout t "Cons " ?i " of " ?n ": isl = " ?isl-payl "gs-a = " $?gs-a " gs-p = " $?gs-p " gs = " ?gs-payl crlf)
+    (assert (MANIFEST::CONSTELLATION (id (str-cat "cons-" ?i)) (payload (get-elems$ (find$ ?i $?pack) $?payls))
+                (num-planes (nth$ ?i $?np)) (num-sats-per-plane (nth$ ?i $?ns)) (satellite (nth$ ?i $?orbs))
+                (orbit (nth$ ?i $?orbs)) (lifetime ?life) (contract-modality (nth$ ?i $?contracts))
+                (isl-payload ?isl-payl) (icl-payload ?icl-payl) (gs-payload ?gs-payl)))))
+
+(defrule copy-gs-payload-allocation
+     (declare (salience 10))
+    ?arch <- (MANIFEST::ARCHITECTURE (id ?id&~nil) (gs-payloads $?gs-p) (gs-payload-allocation $?gs-a) (num-constel ?nc&~nil))
+    (not (ENUMERATION::DECISION (name gs-payload-allocation)))
+    (test (neq (length$ $?gs-a) (length$ $?gs-p)))
+    =>
+    (bind ?new-gs-a (repeat$ (nth$ 1 $?gs-a) (length$ $?gs-p))); [3 3 3]
+    (bind ?new-gs-a (transpose-decimal$ ?new-gs-a (length$ $?gs-p)))
+    (modify ?arch (gs-payload-allocation ?new-gs-a))
+    )
+
+(defrule copy-isl-payload-allocation
+     (declare (salience 10))
+    ?arch <- (MANIFEST::ARCHITECTURE (isl-payloads $?isl-p) (isl-payload-allocation $?isl-a) (num-constel ?nc&~nil))
+    (not (ENUMERATION::DECISION (name isl-payload-allocation)))
+    (test (neq (length$ $?isl-a) ?nc))
+    =>
+    (modify ?arch (isl-payload-allocation (repeat$ (nth$ 1 $?isl-a) ?nc)))
+    )
+
+(defrule MANIFEST::get-orbit-info  
+    (declare (salience 10))
+    ?const <- (MANIFEST::CONSTELLATION (orbit ?orb&~nil) (orbit-altitude nil) (orbit-type nil) (orbit-inclination nil))
+    (DATABASE::ORBIT (id ?orb) (orbit-altitude ?h) (orbit-type ?typ) (orbit-inclination ?inc) (orbit-arg-of-perigee ?arg) 
+        (orbit-central-body ?centr) (orbit-eccentricity ?e) (orbit-raan ?raan))
+    =>
+    (modify ?const (orbit-altitude ?h) (orbit-type ?typ) (orbit-inclination ?inc) (orbit-arg-of-perigee ?arg) 
+        (orbit-central-body ?centr) (orbit-eccentricity ?e) (orbit-raan ?raan) (orbit-semimajor-axis (* 1000 (+ ?*Re* ?h))))
+    )
+
+
+(defrule MANIFEST::assert-satellite-from-constellation
+    (declare (salience 10))
+    (MANIFEST::CONSTELLATION (satellite ?sat&~nil) (id ?name) (payload $?payl) (isl-payload ?isl-payl) (icl-payload ?icl-payl) (gs-payload $?gs-payl)
+                 (lifetime ?life))
+    =>
+        (assert (MANIFEST::SATELLITE (copy-from ?sat) (id (str-cat ?name "-" ?sat)) (constellation ?name) (antennae $?payl)
+            (isl-antenna ?isl-payl) (icl-antenna ?icl-payl) (gs-antenna $?gs-payl) (lifetime ?life)))
+    )
+
+(defrule MANIFEST::assert-antennae-from-satellite
+    (declare (salience 10))
+    (MANIFEST::SATELLITE (antennae $?payls&:(notempty$ $?payls)) (id ?name))
+    =>
+    (foreach ?payl $?payls
+        (assert (MANIFEST::ANTENNA (id ?payl) (satellite ?name))))
+    )
+
+(defrule MANIFEST::assert-ground-antenna-from-satellite
+    (declare (salience 10))
+    (MANIFEST::SATELLITE (gs-antenna $?payls) (id ?name))
+    =>
+    (foreach ?payl $?payls
+        (assert (MANIFEST::ANTENNA (id ?payl) (satellite ?name))))
+    )
+
+(defrule MANIFEST::assert-isl-antennae-from-satellite
+    (declare (salience 10))
+    (MANIFEST::SATELLITE (isl-antenna ?payl&~nil) (id ?name))
+    =>
+        (assert (MANIFEST::ANTENNA (id ?payl) (satellite ?name)))
+    )
+
+(defrule MANIFEST::assert-icl-antenna-from-satellite
+    (declare (salience 10))
+    (MANIFEST::SATELLITE (icl-antenna ?payl&~nil) (id ?name))
+    =>
+        (assert (MANIFEST::ANTENNA (id ?payl) (satellite ?name)))
+    )
+
+(defrule MANIFEST::import-antenna-payloads-from-db
+    (declare (salience 10))
+    ?ant<- (MANIFEST::ANTENNA (id ?id) (payloads $?payls&:(isempty$ $?payls)))
+    (DATABASE::ANTENNA (id ?id) (payloads $?payls2&:(notempty$ $?payls2)))
+    =>
+        (modify ?ant (payloads $?payls2))
+    )
+
+(defrule MANIFEST::assert-payloads-from-antennae
+    (declare (salience 10))
+    (MANIFEST::ANTENNA (id ?id) (satellite ?name) (payloads $?payls&:(notempty$ $?payls)))
+    =>
+    (foreach ?payl $?payls
+        (assert (MANIFEST::PAYLOAD (id ?payl) (name (str-cat ?name "-" ?payl)) (satellite ?name))))
+    )
+
+(defrule MANIFEST::fill-out-sat-payloads-from-antennae
+     (declare (salience 10))
+    ?sat <- (MANIFEST::SATELLITE (id ?name) (payloads $?old))
+    (MANIFEST::ANTENNA (payloads $?payls&:(notempty$ $?payls)) (satellite ?name))
+    (test (eq (subsetp $?payls $?old) FALSE))
+    =>
+    (modify ?sat (payloads (append$ $?old $?payls)))
+    )
+
+;(defrule MANIFEST::assert-isl-payload-and-antenna-from-satellite
+;    (declare (salience 10))
+;    (MANIFEST::SATELLITE (payloads $?payls) (isl-payload ?isl-payl&~nil)
+;        			     (isl-antenna ?isl-ant&~nil) (id ?name))
+;    =>;;
+;
+;    (assert (MANIFEST::PAYLOAD (id ?isl-payl) (satellite ?name)))
+;    (assert (MANIFEST::ANTENNA (id ?isl-ant) (satellite ?name)))
+;    )
+
+;(defrule MANIFEST::assert-ground-payload-and-antenna-from-satellite
+;    (declare (salience 10))
+;    (MANIFEST::SATELLITE (gs-payload ?gs-payl&~nil)
+;        			     (gs-antenna ?gs-ant&~nil) (id ?name))
+;    =>;
+;
+;    (assert (MANIFEST::PAYLOAD (id ?gs-payl) (satellite ?name)))
+;    (assert (MANIFEST::ANTENNA (id ?gs-ant) (satellite ?name)))
+;    )
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; USERS
+(defrule MANIFEST::assert-users
+    (DATABASE::USER (id ?id))
+    =>
+    (assert (MANIFEST::USER (id ?id)))
+    )
+
+(defrule MANIFEST::assert-payload-from-user
+    (MANIFEST::USER (payloads $?payls) (id ?name))
+    =>
+    (foreach ?payl $?payls
+        (assert (MANIFEST::PAYLOAD (id ?payl) (satellite ?name))))
+    )
+
+(defrule MANIFEST::assert-antenna-from-user
+    (MANIFEST::USER (antennae $?payls) (id ?name))
+    =>
+    (foreach ?payl $?payls
+        (assert (MANIFEST::ANTENNA (id ?payl) (satellite ?name))))
+    )
+
+(defrule MANIFEST::assert-ground-stations
+    (DATABASE::GROUND-STATION (id ?id))
+    =>
+    (assert (MANIFEST::GROUND-STATION (id ?id)))
+    )
+
+(defrule MANIFEST::assert-services
+	(DATABASE::USER (services $?services))
+    =>
+    (foreach ?service $?services
+    	(assert (MANIFEST::SERVICE (id ?service)))    
+    )    
+)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; OLD STUFF
+
+
+
+
+
