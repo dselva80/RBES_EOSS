@@ -1,4 +1,4 @@
-function EON_precompute_revtimes_withnumsats()
+function EON_precompute_revtimes_withnumsats(folder)
 %% EOCubesats_precompute_revtimes.m
 %
 % This function computes the scores of all subsets of instrument in all
@@ -8,7 +8,7 @@ function EON_precompute_revtimes_withnumsats()
 import rbsa.eoss.*
 import rbsa.eoss.local.*
 
-params = Params('C:\\Users\\Ana-Dani\\Dropbox\\Nozomi - Dani\\RBES SMAP for IEEEAero14','CRISP-ATTRIBUTES','test','normal','');
+params = Params(folder,'CRISP-ATTRIBUTES','test','normal','');
 % params = Params('C:\Users\Nozomi\Dropbox\Nozomi - Dani\RBES SMAP for IEEEAero14','CRISP-ATTRIBUTES','test','normal','');
 AE = ArchitectureEvaluator.getInstance;
 AE.init(1);

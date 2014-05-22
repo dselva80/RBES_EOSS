@@ -38,8 +38,8 @@ public class RBSAEOSSSMAP {
     public static void main(String[] args) {
         
         //PATH
-        String path  = "C:\\Users\\DS925\\Documents\\GitHub\\Selva research group\\RBES Demo May2014";//RBES SMAP for IEEEAero14 code
-        //String path  = "C:\\\\Users\\\\Ana-Dani\\\\Dropbox\\\\Nozomi - Dani\\\\RBES SMAP for IEEEAero14";
+        //String path  = "C:\\Users\\DS925\\Documents\\GitHub\\Selva research group\\RBES Demo May2014";//RBES SMAP for IEEEAero14 code
+        String path  = "C:\\Users\\Ana-Dani\\Documents\\GitHub\\RBES_EOSS";
         
         int MODE = 1;
         ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
