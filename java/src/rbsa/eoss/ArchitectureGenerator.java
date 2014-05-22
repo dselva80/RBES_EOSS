@@ -148,8 +148,10 @@ public class ArchitectureGenerator {
         }
         return new Architecture(mat,rnd.nextInt(Params.nsats.length));
     }
-    public Architecture getTestArch() { // This architecture has a science score of 
-        return new Architecture("0000000000000001100011000",2);
+    public Architecture getTestArch() { // SMAP 2 SSO orbits, 2 sats per orbit
+        Architecture arch = new Architecture("0011000000111110000000000",2);
+        arch.setEval_mode("DEBUG");
+        return arch;//{"SMAP_RAD","SMAP_MWR","CMIS","VIIRS","BIOMASS"};{"600polar","600AM","600DD","800AM","800PM"};
     }
 
     public Architecture getMaxArch() {

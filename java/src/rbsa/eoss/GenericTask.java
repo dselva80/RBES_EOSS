@@ -34,7 +34,7 @@ public class GenericTask implements Callable {
     {
         this.arch = arch;
         this.type = type;
-        if (type.equalsIgnoreCase("Slow"))
+        if (type.equalsIgnoreCase("Slow") || arch.getEval_mode().equalsIgnoreCase("DEBUG"))
             debug = true;
         else
             debug = false;
@@ -111,7 +111,7 @@ public class GenericTask implements Callable {
                 subset = thesubset.toArray(subset);
                 String orbit = Params.orbit_list[i];
                 if (subset.length>0) {
-                    String key = orbit + "@" + m.StringArraytoStringWithSpaces(subset);
+                    String key = arch.getNsats() + " x " + orbit + "@" + m.StringArraytoStringWithSpaces(subset);
                     ArrayList<Fact> measurements = (ArrayList<Fact>) Params.capabilities.get(key);
                     for(int j = 0;j<measurements.size();j++) {
                         Fact tmp = (Fact) measurements.get(j).clone();
@@ -148,6 +148,9 @@ public class GenericTask implements Callable {
             r.run();
             
             r.setFocus( "FUZZY" );
+            r.run();
+            
+            r.setFocus( "SYNERGIES" );
             r.run();
             
             r.setFocus( "SYNERGIES-ACROSS-ORBITS" );
@@ -387,7 +390,7 @@ public class GenericTask implements Callable {
             r.run();
             
             capabilities = qb.makeQuery("REQUIREMENTS::Measurement");
-            
+            capabilities.addAll(qb.makeQuery("SYNERGIES::cross-registered"));
         } catch (Exception e) {
             System.out.println( e.getClass() + " " + e.getMessage() + " " + e.getStackTrace());
         }
