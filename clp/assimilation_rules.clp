@@ -52,9 +52,10 @@
 (defrule ASSIMILATION2::modify-temporal-resolution
 	(ASSIMILATION2::UPDATE-REV-TIME (parameter ?p) (avg-revisit-time-global# ?new-time)
 	(avg-revisit-time-US# ?new-time-us))
-	?meas <- (REQUIREMENTS::Measurement (Parameter ?p))
+	?meas <- (REQUIREMENTS::Measurement (Parameter ?p) (Temporal-resolution# nil) (Temporal-resolution nil) (Coverage ?region))
 	=>
-	(modify ?meas (avg-revisit-time-global# ?new-time) (avg-revisit-time-US# (adapt-GEO-revisit ?new-time-us))) 
+	(if (eq ?region Global) then (bind ?tr ?new-time) else (bind ?tr ?new-time-us))
+	(modify ?meas (Temporal-resolution# ?tr) (avg-revisit-time-global# ?new-time) (avg-revisit-time-US# (adapt-GEO-revisit ?new-time-us))) 
 )
 
 ;(defrule ASSIMILATION::compute-temporal-resolution#-from-revisit-times
@@ -67,14 +68,6 @@
 ;    (modify ?meas (Temporal-resolution# ?tr))
 ;    )
 
-(defrule ASSIMILATION::compute-global-temporal-resolution#-from-revisit-time
-    ?meas <- (REQUIREMENTS::Measurement (Temporal-resolution nil) (Temporal-resolution# nil)
-         (avg-revisit-time-global# ?revtime-global&~nil))
-    =>
-    
-    (duplicate ?meas (Coverage Global) (Temporal-resolution# ?revtime-global))
-    )
-	
 (defrule CAPABILITIES::global-or-regional-coverage
 	?meas <- (REQUIREMENTS::Measurement (Coverage nil) (orbit-type ?orb &~nil))
 	=>
@@ -82,11 +75,21 @@
 	(modify ?meas (Coverage ?coverage))
 	)
 	
-(defrule ASSIMILATION::compute-US-temporal-resolution#-from-revisit-time
-    ?meas <- (REQUIREMENTS::Measurement  (Temporal-resolution nil) (Temporal-resolution# nil)
-         (avg-revisit-time-US# ?revtime&~nil))
-    =>
-    
-    (duplicate ?meas (Coverage US) (Temporal-resolution# ?revtime))
-    )
+
+;(defrule ASSIMILATION::compute-global-temporal-resolution#-from-revisit-time
+;    ?meas <- (REQUIREMENTS::Measurement (Temporal-resolution nil) (Temporal-resolution# nil)
+;         (avg-revisit-time-global# ?revtime-global&~nil))
+;    =>
+;    
+;    (duplicate ?meas (Coverage Global) (Temporal-resolution# ?revtime-global))
+;    )
+
+	
+;(defrule ASSIMILATION::compute-US-temporal-resolution#-from-revisit-time
+;    ?meas <- (REQUIREMENTS::Measurement  (Temporal-resolution nil) (Temporal-resolution# nil)
+;         (avg-revisit-time-US# ?revtime&~nil))
+;    =>
+;    
+;    (duplicate ?meas (Coverage US) (Temporal-resolution# ?revtime))
+;    )
 	
