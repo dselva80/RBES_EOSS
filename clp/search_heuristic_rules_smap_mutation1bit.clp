@@ -15,7 +15,7 @@
     (bind ?N 1)
     (for (bind ?i 0) (< ?i ?N) (++ ?i)
 	    
-		(bind ?arch ((new rbsa.eoss.Architecture ?arch0 ?ns) mutate1bit))
+		(bind ?arch ((new rbsa.eoss.Architecture ?orig ?ns) mutate1bit))
     	(assert-string (?arch toFactString)))
 	(retract ?arch0)
     )
