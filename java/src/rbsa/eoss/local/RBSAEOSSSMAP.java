@@ -38,8 +38,8 @@ public class RBSAEOSSSMAP {
     public static void main(String[] args) {
         
         //PATH
-        //String path  = "C:\\Users\\DS925\\Documents\\GitHub\\Selva research group\\RBES Demo May2014";//RBES SMAP for IEEEAero14 code
-        String path  = "C:\\Users\\Ana-Dani\\Documents\\GitHub\\RBES_EOSS";
+        String path  = "C:\\Users\\DS925\\Documents\\GitHub\\RBES_EOSS";//RBES SMAP for IEEEAero14 code
+        //String path  = "C:\\Users\\Ana-Dani\\Documents\\GitHub\\RBES_EOSS";
         
         int MODE = 1;
         ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
@@ -53,7 +53,7 @@ public class RBSAEOSSSMAP {
                 AE.init(1);
                 Architecture arch = ArchitectureGenerator.getInstance().getTestArch();
                 
-                Result result1 = AE.evaluateArchitecture(arch,"Slow");
+                Result result1 = AE.evaluateArchitecture(arch,"Fast");
                 System.out.println("NOSYN. Arch " + arch.toBitString() + "=> science = " + result1.getScience() + " cost = " + result1.getCost());
                 RM.saveResultCollection(new ResultCollection(AE.getResults()));
                 //Result result2 = AE.evaluateArchitecture(arch,"Slow");
@@ -75,7 +75,7 @@ public class RBSAEOSSSMAP {
                 int POP_SIZE = 100;
                 int MAX_SEARCH_ITS = 10;
                 ArrayList<Architecture> init_pop = null;
-                for (int i = 0;i<20;i++) {
+                for (int i = 0;i<2;i++) {
                     params = new Params( path, "CRISP-ATTRIBUTES", "test","normal","search_heuristic_rules_smap_2");//FUZZY or CRISP
                     AE.init(7);
                     AE.evalMinMax();
@@ -147,7 +147,7 @@ public class RBSAEOSSSMAP {
                 break;
             case 6://Update capabilities file
                 params = new Params( path, "CRISP-ATTRIBUTES", "test","update_capabilities",search_clps);//FUZZY or CRISP
-                AE.init(6);
+                AE.init(3);
                 AE.precomputeCapabilities();                
                 try{
                     SimpleDateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd-HH-mm-ss" );
