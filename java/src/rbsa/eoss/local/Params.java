@@ -86,7 +86,7 @@ public class Params {
     // Instruments
     public static String[] instrument_list = {"SMAP_RAD","SMAP_MWR","CMIS","VIIRS","BIOMASS"};
     public static int ninstr;
-    public static String[] orbit_list = {"LEO-600-polar-NA","SSO-600-SSO-AM","SSO-600-SSO-DD","SSO-800-SSO-AM","SSO-800-SSO-PM"};
+    public static String[] orbit_list = {"LEO-600-polar-NA","SSO-600-SSO-AM","SSO-600-SSO-DD","SSO-800-SSO-DD","SSO-800-SSO-PM"};
     public static int norb;
     public static HashMap instrument_indexes;
     public static HashMap orbit_indexes;
