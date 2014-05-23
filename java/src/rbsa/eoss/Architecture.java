@@ -612,7 +612,7 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
             return new_one;
        } else {///mutate nsats but not matrix
  
-            Architecture new_one = new Architecture(bitString,this.norb,this.ninstr,rnd.nextInt(Params.nsats.length));
+            Architecture new_one = new Architecture(bitString,this.norb,this.ninstr,Params.nsats[rnd.nextInt(Params.nsats.length)]);
             new_one.setCrossover(crossover);
             new_one.setImprove(improve);
             return new_one;

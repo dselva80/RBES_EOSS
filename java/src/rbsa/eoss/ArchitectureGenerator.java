@@ -100,7 +100,7 @@ public class ArchitectureGenerator {
                 for (int j = 0; j < GENOME_LENGTH; j++) {
                     x[j] = rnd.nextBoolean();
                 }
-                population.add(new Architecture(x, Params.norb, Params.ninstr,rnd.nextInt(Params.nsats.length)));
+                population.add(new Architecture(x, Params.norb, Params.ninstr,Params.nsats[rnd.nextInt(Params.nsats.length)]));
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -146,7 +146,7 @@ public class ArchitectureGenerator {
             }
 
         }
-        return new Architecture(mat,rnd.nextInt(Params.nsats.length));
+        return new Architecture(mat,Params.nsats[rnd.nextInt(Params.nsats.length)]);
     }
     public Architecture getTestArch() { // SMAP 2 SSO orbits, 2 sats per orbit
         Architecture arch = new Architecture("0011000000111110000000000",1);

@@ -81,7 +81,7 @@ public class GenericTask implements Callable {
             resu.setTaskType(type);
             arch.setResult(resu);
             
-            //System.out.println("Arch " + arch.toBitString() + " " + resu.getTaskType() + ": Science = " + resu.getScience() + "; Cost = " + resu.getCost());
+            System.out.println("Arch " + arch.toBitString() + " " + resu.getTaskType() + ": Science = " + resu.getScience() + "; Cost = " + resu.getCost());
         } catch (Exception e) {
             System.out.println( "EXC in Task:call: " + e.getClass() + " " + e.getMessage() + " " + e.getStackTrace() );
             freeResource();
@@ -144,8 +144,8 @@ public class GenericTask implements Callable {
             r.setFocus( "ASSIMILATION2" );
             r.run();
             
-            r.setFocus( "ASSIMILATION" );
-            r.run();
+            //r.setFocus( "ASSIMILATION" );
+            //r.run();
             
             r.setFocus( "FUZZY" );
             r.run();
