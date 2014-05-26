@@ -163,6 +163,7 @@ public class JessInitializer {
             
             //Create precomputed queries;
             load_precompute_queries(qb);
+        
         } catch (Exception e) {
             System.out.println( "EXC in InitializerJess " +e.getClass() + " : " + e.getMessage() );
         }
@@ -172,9 +173,11 @@ public class JessInitializer {
         for (int i = 0;i<Params.ninstr;i++) {
             String instr = Params.instrument_list[i];
             ArrayList<Fact> facts = qb.makeQuery("DATABASE::Instrument (Name " + instr + ")");
-            db_instruments.put(instr,facts.get(0));
+            Fact f = facts.get(0);
+            db_instruments.put(instr,f);
         }
         qb.addPrecomputed_query("DATABASE::Instrument", db_instruments);
+        
         
     }
     private void loadModules( Rete r )

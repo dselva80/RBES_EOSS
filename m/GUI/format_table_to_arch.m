@@ -1,5 +1,5 @@
 function arch = format_table_to_arch(table)
-    global params
+    params = get_params;
     nsats = table{5,2};
     mapping = java.util.HashMap;
     for i = 5:5+params.norb-1

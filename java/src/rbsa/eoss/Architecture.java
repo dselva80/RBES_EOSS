@@ -5,6 +5,7 @@
 package rbsa.eoss;
 
 import rbsa.eoss.local.Params;
+import java.util.UUID;
 import java.util.Random;
 import org.paukov.combinatorics.*;
 import java.util.TreeMap;
@@ -40,7 +41,7 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
     private String crossover;
     private Nto1pair nto1pair;
     private String improve;
-    private long id;
+    private String id;
     private int nsats;
     
     //Constructors
@@ -61,7 +62,7 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         mutate = "no";
         crossover = "no";
         improve = "no";
-        id = rnd.nextLong();
+        id = UUID.randomUUID().toString();
     }
     public Architecture(Fact f) {
         Resource res = ArchitectureEvaluator.getInstance().getResourcePool().getResource();
@@ -96,7 +97,7 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         mutate = _mutate;
         crossover = _crossover;
         improve = _improve;
-        id = rnd.nextLong();
+        id = UUID.randomUUID().toString();
     }//BooleanString2Matrix
     public Architecture(String bs, int nsat) {
         mat = BooleanString2Matrix(bs);
@@ -115,7 +116,7 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         mutate = "no";
         crossover = "no";
         improve = "no";
-        id = rnd.nextLong();
+        id = UUID.randomUUID().toString();
     }//BooleanString2Matrix
     public Architecture(boolean[][] mat, int nsat) {
         this.mat = mat;
@@ -134,7 +135,7 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         mutate = "no";
         crossover = "no";
         improve = "no";
-        id = rnd.nextLong();
+        id = UUID.randomUUID().toString();
     }
     public Architecture(String[] payload, String orbit) {
         this.payloads = payload;
@@ -163,7 +164,7 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         mutate = "no";
         crossover = "no";
         improve = "no";
-        id = rnd.nextLong();
+        id = UUID.randomUUID().toString();
     }
     public Architecture(Nto1pair nto1pair, String orbit) {
         this.nto1pair = nto1pair;
@@ -200,7 +201,7 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         mutate = "no";
         crossover = "no";
         improve = "no";
-        id = rnd.nextLong();
+        id = UUID.randomUUID().toString();
     }
     public Architecture(ICombinatoricsVector<String> payl, String orbit) {
         int n = payl.getSize();
@@ -234,7 +235,7 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         mutate = "no";
         crossover = "no";
         improve = "no";
-        id = rnd.nextLong();
+        id = UUID.randomUUID().toString();
     }
     public Architecture(HashMap<String,String[]> mapping, int nsat) {
         mat = new boolean[Params.norb][Params.ninstr];
@@ -271,7 +272,7 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         mutate = "no";
         crossover = "no";
         improve = "no";
-        id = rnd.nextLong(); 
+        id = UUID.randomUUID().toString();
     }
     
     //Getters
@@ -279,7 +280,7 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
     public int getNsats() {
         return nsats;
     }
-    public long getId() {
+    public String getId() {
         return id;
     }
     public String[] getPayloads() {
@@ -544,7 +545,25 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         }
          return thepayloads;
     }
-       
+    public boolean hasInstrument(String instr) {
+        for (int i = 0; i < Params.norb; i++) {
+            String[] payl = getPayloadInOrbit(Params.orbit_list[i]);
+            for (int j = 0; j < payl.length; j++) {
+                if (payl[j].equalsIgnoreCase(instr)) {
+                    return true;
+                }
+            } 
+        }
+        return false;
+    }
+    public int getNInstrLowTRL() {
+        int ninstrlowTRL = 0;
+        for (String instr:ArchitectureEvaluator.getInstance().getLowTRLinstruments())
+            if (hasInstrument(instr))
+                ninstrlowTRL++;
+        return ninstrlowTRL;
+    }
+    
     //CompareTo
     @Override
     public int compareTo(Architecture other) {

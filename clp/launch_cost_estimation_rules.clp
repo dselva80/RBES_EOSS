@@ -35,8 +35,9 @@
     the cost of a single launch."
     
     ?f <- (MANIFEST::Mission (launch-vehicle ?lv&~nil) (num-launches ?num&~nil)
-        (launch-cost# nil))
+        (launch-cost# nil) (num-of-planes# ?np&~nil) (num-of-sats-per-plane# ?ns&~nil))
     =>
+	(if (> ?num  (* ?np ?ns)) then (bind ?ccost 1e10)) ; If there are more launches than satellites then infeasible!
     (bind ?ccost (MatlabFunctions getLaunchVehicleCost ?lv))
     ;(modify ?f (launch-cost# (* ?num ?ccost)) (launch-cost (fuzzyscprod (cost-fv ?ccost 10) ?num)))
 	(modify ?f (launch-cost# (* ?num ?ccost)) )

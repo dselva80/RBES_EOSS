@@ -88,10 +88,12 @@ function evaluateArchitecture_Callback(hObject, eventdata, handles)
 % hObject    handle to evaluateArchitecture (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global zeArch AE resCol
+global zeArch resCol
+AE = get_AE;
 
 data = get(handles.table,'Data');
 zeArch = format_table_to_arch(data);
+zeArch.setEval_mode('DEBUG');
 res = AE.evaluateArchitecture(zeArch,'Fast');
 fprintf('%s\n',char(res.toString));
 resCol.pushResult(res);

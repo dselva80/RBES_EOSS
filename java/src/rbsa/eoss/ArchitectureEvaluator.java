@@ -34,7 +34,7 @@ public class ArchitectureEvaluator {
     private Resource searchRes;
     //private ThreadPoolExecutor tpe;
     private ExecutorService tpe;
-
+    private ArrayList<String> lowTRLinstruments;
     private int numCPU;
     //private int population_size;
     private Stack<Result> results;
@@ -48,6 +48,22 @@ public class ArchitectureEvaluator {
         results = new Stack<Result>();
         searchRes = null;
         futures = new ArrayList<Future<Result>>();
+        population = null;
+        rp = null;
+        tpe = null;
+        numCPU = 0;
+        capabilities = null;
+        lowTRLinstruments = new ArrayList<String>();
+       // population_size = 0;
+        dsm_map = new HashMap<String,NDSM>();
+        scores = new HashMap<ArrayList<String>, HashMap<String,Double>>();
+        subobj_scores = new  HashMap<ArrayList<String>, HashMap<String,ArrayList<Double>>>();
+    }
+    public void clear() {
+        results = new Stack<Result>();
+        searchRes = null;
+        futures = new ArrayList<Future<Result>>();
+        lowTRLinstruments = new ArrayList<String>();
         population = null;
         rp = null;
         tpe = null;
@@ -311,6 +327,15 @@ public class ArchitectureEvaluator {
         }
         results.clear();
         futures.clear();
+        for (String instr:Params.instrument_list) {
+            Fact f = (Fact)searchRes.getQueryBuilder().getPrecomputed_query("DATABASE::Instrument").get(instr);
+            try{
+                if(f.getSlotValue("Technology-Readiness-Level").intValue(null)<5)
+                    lowTRLinstruments.add(instr);
+            }catch(JessException e) {
+                e.printStackTrace();
+            }
+        }
     }
     
     public void setScores (HashMap<ArrayList<String>, HashMap<String,Double>> scores) {
@@ -350,8 +375,12 @@ public class ArchitectureEvaluator {
         }
         
     }
+
+    public ArrayList<String> getLowTRLinstruments() {
+        return lowTRLinstruments;
+    }
             
-            
+             
      public void evaluatePopulation()
     {
         //ArrayList<Result> results = new ArrayList<Result>();

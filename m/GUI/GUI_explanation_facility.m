@@ -22,7 +22,7 @@ function varargout = GUI_explanation_facility(varargin)
 
 % Edit the above text to modify the response to help GUI_explanation_facility
 
-% Last Modified by GUIDE v2.5 06-May-2014 17:20:19
+% Last Modified by GUIDE v2.5 25-May-2014 17:53:02
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -56,6 +56,7 @@ function GUI_explanation_facility_OpeningFcn(hObject, eventdata, handles, vararg
     handles.output = hObject;
 
     global r;
+    global zeResult;
     global results;
     global resMngr;
     global resCol;
@@ -77,12 +78,14 @@ function GUI_explanation_facility_OpeningFcn(hObject, eventdata, handles, vararg
     import jess.*;
     
     r = jess.Rete;
+    zeResult = [];
     results = [];
-    
     resMngr = [];
     resCol = [];
     zeArch = [];
-%     folder = 'C:\Users\DS925\Documents\GitHub\Selva research group\RBES Demo May2014';
+    get_params;
+    get_AE();
+%     folder = pwd;
 %     params = rbsa.eoss.local.Params(folder,'CRISP-ATTRIBUTES','test','normal','');
     set(gcf,'MenuBar','figure');
 %     if ~exist('AE','var') || isempty(AE)        
@@ -121,14 +124,13 @@ global archs;
 global results;
 global architecture;
 global resCol;
-global hm;
 archs = get_all_archs;
-
-archs_str = cell(1, resCol.getResults.size);
+results = resCol.getResults;
+archs_str = cell(1, results.size);
 
 for i = 1:length(archs)
 %     archs_str{i} = archs{i}.getVariable('id');
-     archs_str{i} = ['Architecture ' num2str(archs{i}.getId)];
+     archs_str{i} = ['Architecture ' char(archs{i}.getId)];
 end
 
 % Set tehe combobox     to select architectures
@@ -180,10 +182,13 @@ function RBES_plot25(handles,ax,archs,results, inaxis,filter_func,PARETO)
     if isempty(filter_func) || strcmp(filter_func,'') || strcmp(filter_func,' ')
         labels = {'Architectures','Pareto Front'};
         vals = ones(narch,1);
+        labels_map = java.util.HashMap;
     else
-        eval(['[~,labels] = ' filter_func '(archs{1})']);
+        eval(['[~,labels_map] = ' filter_func '(archs{1});']);
         if PARETO
-            labels = ['Pareto front' labels];
+            labels = {'Pareto front'};
+        else
+            labels = {};
         end
         vals = cellfun(str2func(filter_func),archs);
     end
@@ -199,6 +204,7 @@ function RBES_plot25(handles,ax,archs,results, inaxis,filter_func,PARETO)
     hold on;
     for i = 1 : n
         indexes{i} = (vals == unique_vals(i));
+        labels = [labels;labels_map.get(unique_vals(i))]; 
         scatter(xvals(indexes{i}),yvals(indexes{i}),'Marker',markers{i},'MarkerEdgeColor',colors{i},...
                 'Parent',ax,'ButtonDownFcn', {@axes_ButtonDownFcn,archs(indexes{i}),xvals(indexes{i}),yvals(indexes{i}),handles});
         xlim( [0 1] );
@@ -206,7 +212,7 @@ function RBES_plot25(handles,ax,archs,results, inaxis,filter_func,PARETO)
     end
    
     
-        grid on;
+    grid on;
     xlabel(inaxis{1});
     ylabel(inaxis{2});
     legend(labels,'Location','Best');
@@ -230,7 +236,7 @@ update_buttons_status( handles, 'off' );
 architecture = [];
 zeArch = archs{ind};
 zeResult = zeArch.getResult;
-ind = find( strcmp( get( handles.comboSelectArch, 'String' ), ['Architecture ' num2str(zeArch.getId)] ) );
+ind = find( strcmp( get( handles.comboSelectArch, 'String' ), ['Architecture ' char(zeArch.getId)] ) );
 set( handles.comboSelectArch, 'Value', ind );
 
 %create_element_hierarchy;
@@ -400,9 +406,11 @@ if isempty(filter_func) || strcmp(filter_func,'') || strcmp(filter_func,' ')
     labels = {'Architectures','Pareto Front'};
     vals = ones(narch,1);
 else
-    eval(['[~,labels] = ' filter_func '(archs{1})']);
+    eval(['[~,labels_map] = ' filter_func '(archs{1})']);
     if PARETO
-        labels = ['Pareto front' labels];
+        labels = {'Pareto front'};
+    else
+        labels = {};
     end
     vals = cellfun(str2func(filter_func),archs);
 end
@@ -417,6 +425,7 @@ colors = COLORS(1:length(unique_vals));
  end
 hold on;
 for i = 1 : n
+    labels = [labels;labels_map.get(unique_vals(i))]; 
     indexes{i} = (vals == unique_vals(i));
     scatter(xvals(indexes{i}),yvals(indexes{i}),ms,'Marker',markers{i},'MarkerEdgeColor',colors{i},...
         'Parent',ax);
@@ -578,12 +587,12 @@ function comboSelectArch_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns comboSelectArch contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from comboSelectArch
 
-global results;
+global zeResult;
 global archs;
 global zeArch;
 
 selArch = get( handles.comboSelectArch, 'Value' );
-results = archs{selArch}.getResult;
+zeResult = archs{selArch}.getResult;
 zeArch = archs{selArch};
 
 %create_element_hierarchy;
@@ -626,18 +635,21 @@ function buttonEvalArch_Callback(hObject, eventdata, handles)
 
 global zeArch;
 global resCol;
-global results;
+global zeResult;
 global archs;
 % global AE
 % zeArch = archs{get(handles.comboSelectArch, 'Value')};
 AE = get_AE();
+zeArch.setEval_mode('DEBUG');
+disp('Evaluating arch...');
 res = AE.evaluateArchitecture(zeArch,'Fast');
 for i = 0:resCol.getResults.size-1
     if strcmp( resCol.getResults.get(i).getArch.getId, zeArch.getId )
         resCol.results{i} = res;
     end
 end
-results = res;
+disp('Done.');
+zeResult = res;
 % --- Executes on button press in buttonEvaluateNewArchitecture.
 function buttonEvaluateNewArchitecture_Callback(hObject, eventdata, handles)
 % hObject    handle to buttonEvaluateNewArchitecture (see GCBO)
@@ -650,7 +662,7 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global results;
+global results
 global architecture;
 global archs;
 global resMngr;
@@ -670,8 +682,16 @@ resCol = resMngr.loadResultCollectionFromFile( [PathName FileName] );
 results = resCol.getResults;
 
 
-set( handles.txtFilePath, 'String', char(resCol.getFilePath) );
-set( handles.txtInputFile, 'String', FileName );
+set( handles.txtFilePath, 'String', FileName );
+conf = resCol.getConf;
+reqs = char(conf.get('Requirements'));
+tmp = find(reqs=='\',100,'last');
+set( handles.txtInputFile, 'String',  reqs(tmp(end)+1:end));
+
+capas = char(conf.get('Capabilities'));
+tmp = find(capas=='\',100,'last');
+set( handles.txtCapaFile, 'String',  capas(tmp(end)+1:end));
+
 set( handles.txtTimeStamp, 'String', char(resCol.getStamp) );
 
 archs = get_all_archs;
@@ -693,7 +713,7 @@ archs_str = cell(1, resCol.getResults.size);
 for i = 1:length(archs)
 %     archs_str{i} = archs{i}.getVariable('id');
 %     archs_str{i} = ['Architecture ' num2str(i)]
-    archs_str{i} = ['Architecture ' num2str(archs{i}.getId)];
+    archs_str{i} = ['Architecture ' char(archs{i}.getId)];
 end
 
 % Set tehe combobox     to select architectures
@@ -790,3 +810,26 @@ function buttonSaveRC_Callback(hObject, eventdata, handles)
 % hObject    handle to buttonSaveRC (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+
+function txtCapaFile_Callback(hObject, eventdata, handles)
+% hObject    handle to txtCapaFile (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of txtCapaFile as text
+%        str2double(get(hObject,'String')) returns contents of txtCapaFile as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function txtCapaFile_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to txtCapaFile (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

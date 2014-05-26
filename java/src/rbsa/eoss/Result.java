@@ -26,6 +26,7 @@ public class Result implements java.io.Serializable {
     private TreeMap<String,ArrayList<Fact>> explanations;
     private TreeMap<String,Double> subobjective_scores2;
     private ArrayList<Fact> capabilities;
+    private ArrayList<Fact> cost_facts;
     private int paretoRanking;
     private double crowdingDistance;
     private double utility;
@@ -45,6 +46,7 @@ public class Result implements java.io.Serializable {
         this.arch = arch;
         explanations=null;
         capabilities = null;
+        cost_facts = null;
         paretoRanking = -1;
         crowdingDistance = 0.0;
         utility = -1.0;
@@ -64,6 +66,7 @@ public class Result implements java.io.Serializable {
         this.arch = arch;
         explanations=null;
         capabilities = null;
+        cost_facts = null;
         paretoRanking = -1;
         crowdingDistance = 0.0;
         utility = -1.0;
@@ -83,6 +86,7 @@ public class Result implements java.io.Serializable {
         this.arch = arch;
         explanations=null;
         capabilities = null;
+        cost_facts = null;
         paretoRanking = pr;
         crowdingDistance = 0.0;
         utility = -1.0;
@@ -162,15 +166,12 @@ public class Result implements java.io.Serializable {
     public void setObjective_scores(ArrayList objective_scores) {
         this.objective_scores = objective_scores;
     }
-
     public TreeMap<String, Double> getSubobjective_scores2() {
         return subobjective_scores2;
     }
-
     public void setSubobjective_scores2(TreeMap<String, Double> subobjective_scores2) {
         this.subobjective_scores2 = subobjective_scores2;
     }
-    
     public ArrayList getPanel_scores() {
         return panel_scores;
     }
@@ -183,6 +184,13 @@ public class Result implements java.io.Serializable {
     public double getNorm_cost() {
         return norm_cost;
     }
+    public ArrayList<Fact> getCost_facts() {
+        return cost_facts;
+    }
+    public void setCost_facts(ArrayList<Fact> cost_facts) {
+        this.cost_facts = cost_facts;
+    }
+    
     /*public FuzzyValue getFuzzy_science() {
         return fuzzy_science;
     }

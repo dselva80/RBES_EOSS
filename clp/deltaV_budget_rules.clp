@@ -6,14 +6,16 @@
 ; 6 RULES
 
 (defrule MASS-BUDGET::compute-deltaV-injection
-    "This rule computes the delta-V required for injection assuming a transfer orbit with a perigee 
+    "This rule computes the delta-V required for injection for GEO or MEO assuming a transfer orbit with a perigee 
     of 150km and an apogee at the desired orbit, as suggested in De Weck's paper found in 
-    http://strategic.mit.edu/docs/2_3_JSR_parametric_NGSO.pdf"
+    http://strategic.mit.edu/docs/2_3_JSR_parametric_NGSO.pdf. For LEO/SSO, no injection is required."
     
-    ?miss <- (MANIFEST::Mission (orbit-semimajor-axis ?a&~nil) 
+    ?miss <- (MANIFEST::Mission (orbit-type ?typ) (orbit-semimajor-axis ?a&~nil) 
          (delta-V-injection nil) )
     =>
-    (bind ?dV (compute-dV-injection (+ 6378000 150000) ?a))  
+	(if (or (eq ?typ GEO) (eq ?typ MEO)) then (bind ?dV (compute-dV-injection (+ 6378000 150000) ?a))
+	else (bind ?dV 0.0))  
+    
     (modify ?miss (delta-V-injection ?dV))
     )
 

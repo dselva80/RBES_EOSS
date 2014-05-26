@@ -81,7 +81,7 @@ public class GenericTask implements Callable {
             resu.setTaskType(type);
             arch.setResult(resu);
             
-            System.out.println("Arch " + arch.toBitString() + " " + resu.getTaskType() + ": Science = " + resu.getScience() + "; Cost = " + resu.getCost());
+            System.out.println("Arch " + arch.toBitString() + " nsats = " + arch.getNsats() + " " + resu.getTaskType() + ": Science = " + resu.getScience() + "; Cost = " + resu.getCost());
         } catch (Exception e) {
             System.out.println( "EXC in Task:call: " + e.getClass() + " " + e.getMessage() + " " + e.getStackTrace() );
             freeResource();
@@ -166,18 +166,7 @@ public class GenericTask implements Callable {
             } else if ((Params.req_mode.equalsIgnoreCase("CRISP-CASES")) || (Params.req_mode.equalsIgnoreCase("FUZZY-CASES"))){
                 result = aggregate_performance_score(r);
             }
-            /*if(result.getScience() > Params.max_science) { //Impossible, switch to debug mode
-                ArrayList<Fact> partials = qb.makeQuery("REASONING::partially-satisfied");
-                ArrayList<Fact> fulls = qb.makeQuery("REASONING::fully-satisfied");
-                fulls.addAll(partials);
-                result.setExplanations(fulls);
-            }
-            if (arch.getEval_mode().equalsIgnoreCase("DEBUG")) {
-                ArrayList<Fact> partials = qb.makeQuery("REASONING::partially-satisfied");
-                ArrayList<Fact> fulls = qb.makeQuery("REASONING::fully-satisfied");
-                fulls.addAll(partials);
-                result.setExplanations(fulls);
-            }*/
+
             
             
         } catch (Exception e) {
@@ -209,20 +198,19 @@ public class GenericTask implements Callable {
                if(current_subobj_score != null && subobj_score > current_subobj_score || current_subobj_score == null)
                    tm.put(subobj, subobj_score);
                explanations.put(subobj, qb.makeQuery("AGGREGATION::SUBOBJECTIVE (id " + subobj + ")"));   
-               //if(explanations.get(subobj) == null || explanations.get(subobj) != null && explanations.get(subobj).getSlotValue("satisfaction").floatValue(r.getGlobalContext()) < subobj_score)
-                   //explanations.put(subobj, f);
            }
+           
            for (Iterator<String> name = tm.keySet().iterator();name.hasNext();) {
                subobj_scores.add(tm.get(name.next()));
            }
-           //TO DO: obj_score and subobj_scores.
        }catch(Exception e) {
                 System.out.println(e.getMessage() + " " + e.getClass() + " " + e.getStackTrace());
+                e.printStackTrace();
             }
        Result theresult = new Result(arch, science, cost, subobj_scores, obj_scores, panel_scores,tm);
        if(debug) {
-           theresult.setExplanations(explanations);
            theresult.setCapabilities(qb.makeQuery("REQUIREMENTS::Measurement"));
+           theresult.setExplanations(explanations);
        }
        
        return theresult;
@@ -318,8 +306,11 @@ public class GenericTask implements Callable {
             }
             
             res.setCost(cost);
+            if(debug)
+                res.setCost_facts(missions);
         } catch(Exception e) {
             System.out.println("EXC in evaluateCost: " + e.getClass() + " " + e.getMessage() + " " + e.getStackTrace());
+            e.printStackTrace();
         }
         //System.out.println("Arch " + arch.toBitString() + ": Science = " + res.getScience() + "; Cost = " + res.getCost());
     }

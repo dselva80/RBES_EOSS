@@ -115,7 +115,7 @@ public class Params {
     public static HashMap subobjectives_to_measurements;
     public static HashMap objectives_to_measurements;
     public static HashMap panels_to_measurements;
-    
+    public ArrayList<String> lowTRL_instruments;
     public static int npanels;
     public static ArrayList<Double> panel_weights;
     public static ArrayList<String> panel_names;
@@ -149,13 +149,13 @@ public class Params {
         revtimes_dat_file = path + "\\dat\\revtimes.dat";
         dsm_dat_file = path + "\\dat\\all_dsms.dat";
         scores_dat_file = path  + "\\dat\\scores.dat";
-        initial_pop = "";//path_save_results + "\\2014-04-08_10-19-15_test.rs"
+        initial_pop = path_save_results + "\\2014-05-25_18-43-30_test.rs";
         
         // Paths for common xls files
         template_definition_xls = path + "\\xls\\AttributeSet.xls";//used
         mission_analysis_database_xls = path + "\\xls\\Mission Analysis Database.xls";//used
         capability_rules_xls = path + "\\xls\\SMAP Instrument Capability Definition.xls";//used
-        requirement_satisfaction_xls = path + "\\xls\\SMAP Requirement Rules.xls";//used
+        requirement_satisfaction_xls = path + "\\xls\\SMAP Requirement Rules HighTempRes.xls";//used
         aggregation_xls = path + "\\xls\\SMAP Aggregation Rules.xls";//used        
         
         
@@ -247,6 +247,8 @@ public class Params {
         panels_to_measurements = new HashMap();
         
         try {
+            
+            
             if(!run_mode.equalsIgnoreCase("update_revtimes")) {
                 FileInputStream fis = new FileInputStream(revtimes_dat_file);
                 ObjectInputStream ois = new ObjectInputStream(fis);
@@ -279,7 +281,7 @@ public class Params {
         }
        }
     public static String getConfiguration() {
-        return "requirement_satisfaction_xls = " + requirement_satisfaction_xls + ";capability_rules_xls = " + capability_rules_xls;
+        return "reqs" + requirement_satisfaction_xls + ";capas= " + capability_rules_xls;
     }
 
     public static String getName() {

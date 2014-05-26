@@ -100,7 +100,9 @@ public class ArchitectureGenerator {
                 for (int j = 0; j < GENOME_LENGTH; j++) {
                     x[j] = rnd.nextBoolean();
                 }
-                population.add(new Architecture(x, Params.norb, Params.ninstr,Params.nsats[rnd.nextInt(Params.nsats.length)]));
+                Architecture arch = new Architecture(x, Params.norb, Params.ninstr,Params.nsats[rnd.nextInt(Params.nsats.length)]);
+                //arch.setEval_mode("DEBUG");
+                population.add(arch);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -126,6 +128,7 @@ public class ArchitectureGenerator {
                     arch[j] = true;
                 }
                 Architecture arch2 = new Architecture(arch,Params.norb,Params.ninstr,pop0.get(k).getNsats());
+                arch2.setEval_mode("DEBUG");
                 pop1.add(arch2);
                 
             }

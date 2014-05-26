@@ -13,14 +13,15 @@ import java.util.Date;
 import java.util.Stack;
 import rbsa.eoss.local.Params;
 import java.util.ArrayList;
-
+import java.util.HashMap;
+        
 public class ResultCollection implements java.io.Serializable {
     
     private String stamp;
     private String filePath;
     private String name;
     private Stack<Result> results;
-    private String conf;
+    private HashMap<String,String> conf;
     private ArrayList<Result> front;
     
     public ResultCollection()
@@ -28,7 +29,9 @@ public class ResultCollection implements java.io.Serializable {
         SimpleDateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd_HH-mm-ss" );
         stamp = dateFormat.format( new Date() );
         name = Params.getName();
-        conf = Params.getConfiguration();
+        conf = new HashMap<String,String>();
+        conf.put("Requirements",Params.requirement_satisfaction_xls);
+        conf.put("Capabilities",Params.capability_rules_xls);
         //int ind1 = inputFile.indexOf("\\");
         //int ind2 = inputFile.indexOf(".");
         //String tmp = inputFile.substring(ind1+1, ind2);
@@ -43,7 +46,10 @@ public class ResultCollection implements java.io.Serializable {
         SimpleDateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd_HH-mm-ss" );
         stamp = dateFormat.format( new Date() );
         name = Params.getName();
-        conf = Params.getConfiguration();
+        conf = new HashMap<String,String>();
+        conf.put("Requirements",Params.requirement_satisfaction_xls);
+        conf.put("Capabilities",Params.capability_rules_xls);
+        
         //int ind1 = inputFile.indexOf("\\");
         //int ind2 = inputFile.indexOf(".");
         //String tmp = inputFile.substring(ind1+1, ind2);
@@ -147,13 +153,15 @@ public class ResultCollection implements java.io.Serializable {
         return results.isEmpty();
     }
 
-    public String getConf() {
+    public HashMap<String, String> getConf() {
         return conf;
     }
 
-    public void setConf(String conf) {
+    public void setConf(HashMap<String, String> conf) {
         this.conf = conf;
     }
+
+    
     
 }
 

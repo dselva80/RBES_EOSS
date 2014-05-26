@@ -1,0 +1,12 @@
+function [ret,labels] = num_lowTRL_instr_filter(arch)
+% Assign numerical values in increasing order set by labels
+params = get_params;
+AE = get
+ret = arch.getNInstrLowTRL + 0.0;
+labels = java.util.HashMap;
+for i = 0:params.ninstr
+    tmp = double(i);
+    labels.put(tmp,[num2str(i) ' low TRL instruments']);
+end
+	
+end

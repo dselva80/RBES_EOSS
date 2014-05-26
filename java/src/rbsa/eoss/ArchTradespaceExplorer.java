@@ -35,7 +35,15 @@ public class ArchTradespaceExplorer {
         rnd = new Random();
         sp = null;
     }
-    
+    public void clear() {
+        results = new Stack<Result>();
+        current_population = null;
+        current_best_archs = null;
+        nits = 0;
+        term_crit = null;
+        rnd = new Random();
+        sp = null;
+    }
     public static ArchTradespaceExplorer getInstance()
     {
         if( instance == null ) 
