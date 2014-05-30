@@ -137,6 +137,7 @@ end
 set( handles.comboSelectArch, 'String', archs_str );
 set( handles.comboSelectArch, 'UserData', [1:(length(archs)) ] );
 update_buttons_status( handles, 'off' );
+set( handles.num_archs,'String', num2str(length(archs)) );
 % results = [];
 architecture = [];
 
@@ -199,6 +200,7 @@ function RBES_plot25(handles,ax,archs,results, inaxis,filter_func,PARETO)
     colors = COLORS(1:length(unique_vals));
     if PARETO
         [x_pareto, y_pareto, inds, ~ ] = pareto_front([xvals yvals] , {'LIB', 'SIB'});
+        set( handles.num_archs_pf,'String', num2str(length(inds)) );
         plot( x_pareto, y_pareto, 'r--','Parent',ax,'ButtonDownFcn',  {@axes_ButtonDownFcn,archs(inds),x_pareto,y_pareto,handles});
     end
     hold on;
