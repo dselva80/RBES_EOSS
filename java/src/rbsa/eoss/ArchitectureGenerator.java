@@ -112,28 +112,58 @@ public class ArchitectureGenerator {
     }
 
     public ArrayList<Architecture> localSearch(ArrayList<Architecture> pop0) {
-        int n1 = pop0.size();
+        //Remove duplicates
+        
         ArrayList<Architecture> pop1 = new ArrayList<Architecture>(); 
-        for (int i = 0;i<n1;i++) {
-            pop1.add(pop0.get(i));
+        for (Architecture arch1:pop0) {
+            boolean UNIQUE = true;
+            for (Architecture arch2:pop0) {
+                if (arch1.getId() != arch2.getId() && arch1.compareTo(arch2) == 0) {
+                    UNIQUE = false;
+                    break;
+                }
+            }
+            if (UNIQUE)
+                pop1.add(arch1);
         }
-        int nvars = pop0.get(0).getBitString().length;
+        //ArrayList<Architecture> pop1  = new ArrayList<Architecture>(new HashSet<Architecture>(pop0));
+        int n1 = pop1.size();
+        ArrayList<Architecture> pop2  = new ArrayList<Architecture>();
+        int nvars = pop1.get(0).getBitString().length;
+        for (Architecture arch:pop1) {
+            if (arch.getNsats()>1)
+                pop2.add(new Architecture(arch.getBitString(),Params.norb,Params.ninstr,arch.getNsats()-1));
+            if (arch.getNsats()<Params.nsats[Params.nsats.length-1])
+                pop2.add(new Architecture(arch.getBitString(),Params.norb,Params.ninstr,arch.getNsats()+1));
+        }
         for (int k = 0;k<n1;k++) {
             //System.out.println("Searching around arch " + k);
             for (int j = 0;j<nvars;j++) {
-                boolean[] arch = pop0.get(k).getBitString().clone();
+                boolean[] arch = pop1.get(k).getBitString().clone();
                 if(arch[j]) {
                     arch[j] = false;
                 } else {
                     arch[j] = true;
                 }
-                Architecture arch2 = new Architecture(arch,Params.norb,Params.ninstr,pop0.get(k).getNsats());
-                arch2.setEval_mode("DEBUG");
-                pop1.add(arch2);
-                
+                Architecture new_one = new Architecture(arch,Params.norb,Params.ninstr,pop1.get(k).getNsats());
+                pop2.add(new_one);
             }
         }
-        return pop1;
+        
+        //Remove duplicates after local search
+        ArrayList<Architecture> pop3 = new ArrayList<Architecture>(); 
+        for (Architecture arch1:pop2) {
+            boolean UNIQUE = true;
+            for (Architecture arch2:pop2) {
+                if (arch1.getId() != arch2.getId() && arch1.compareTo(arch2) == 0) {
+                    UNIQUE = false;
+                    break;
+                }
+            }
+            if (UNIQUE)
+                pop3.add(arch1);
+        }
+        return pop3;
     }
     
     public ArrayList<Architecture> getPopulation() {
