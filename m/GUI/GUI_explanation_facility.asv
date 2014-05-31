@@ -175,13 +175,9 @@ function RBES_plot25(handles,ax,archs,results, inaxis,filter_func,PARETO)
     narch = length(archs);
     xvals = zeros(narch,1);
     yvals = zeros(narch,1);
-%     fuzzyxvals = cell(narch,1);
-    fuzzyyvals = cell(narch,1);
     for i = 1:narch
         xvals(i) = results.get(i-1).getScience;
         yvals(i) = results.get(i-1).getCost;
-%         fuzzyxvals{i} = results.get(i-1).getFuzzy_science();
-        fuzzyyvals{i} = results.get(i-1).getFuzzy_cost();
     end
     if isempty(filter_func) || strcmp(filter_func,'') || strcmp(filter_func,' ')
         labels = {'Architectures','Pareto Front'};
@@ -212,11 +208,10 @@ function RBES_plot25(handles,ax,archs,results, inaxis,filter_func,PARETO)
         labels = [labels;labels_map.get(unique_vals(i))]; 
         scatter(xvals(indexes{i}),yvals(indexes{i}),'Marker',markers{i},'MarkerEdgeColor',colors{i},...
                 'Parent',ax,'ButtonDownFcn', {@axes_ButtonDownFcn,archs(indexes{i}),xvals(indexes{i}),yvals(indexes{i}),handles});
-        
+        xlim( [0 1] );
         hold on;
     end
-   xlim( [0 1] );
-%    ylim( [0 1] );
+   
     
     grid on;
     xlabel(inaxis{1});
