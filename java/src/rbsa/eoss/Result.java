@@ -250,14 +250,19 @@ public class Result implements java.io.Serializable {
     public void setCost_facts(ArrayList<Fact> cost_facts) {
         this.cost_facts = cost_facts;
     }
-    
     public FuzzyValue getFuzzy_science() {
         return fuzzy_science;
     }
-
-
     public FuzzyValue getFuzzy_cost() {
         return fuzzy_cost;
+    }
+
+    public void setFuzzy_science(FuzzyValue fuzzy_science) {
+        this.fuzzy_science = fuzzy_science;
+    }
+
+    public void setFuzzy_cost(FuzzyValue fuzzy_cost) {
+        this.fuzzy_cost = fuzzy_cost;
     }
 
 

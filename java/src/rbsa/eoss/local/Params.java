@@ -149,7 +149,7 @@ public class Params {
         revtimes_dat_file = path + "\\dat\\revtimes.dat";
         dsm_dat_file = path + "\\dat\\all_dsms.dat";
         scores_dat_file = path  + "\\dat\\scores.dat";
-        initial_pop = path_save_results + "\\2014-05-25_18-43-30_test.rs";
+        initial_pop = path_save_results + "\\2014-05-30_16-59-31_test.rs";
         
         // Paths for common xls files
         template_definition_xls = path + "\\xls\\AttributeSet.xls";//used
