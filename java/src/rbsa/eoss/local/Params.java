@@ -173,14 +173,14 @@ public class Params {
         attribute_inheritance_clp    = path + "\\clp\\attribute_inheritance_rules.clp";
         orbit_rules_clp              = path + "\\clp\\orbit_rules.clp";
         capability_rules_clp         = path + "\\clp\\capability_rules.clp";
-        satisfaction_rules_clp       = path + "\\clp\\satisfaction_rules.clp";
-        demand_rules_clp             = path + "\\clp\\demand_rules.clp";
+        //satisfaction_rules_clp       = path + "\\clp\\satisfaction_rules.clp";
+        //demand_rules_clp             = path + "\\clp\\demand_rules.clp";
         synergy_rules_clp            = path + "\\clp\\synergy_rules.clp";//Used
         explanation_rules_clp        = path + "\\clp\\explanation_rules.clp";//Used
         fuzzy_attribute_clp          = path + "\\clp\\fuzzy_attribute_rules.clp";
         value_aggregation_clp        = path + "\\clp\\requirement_rules.clp";
         requirement_satisfaction_clp = path + "\\clp\\aggregation_rules.clp";
-        cost_estimation_rules_clp    = path + "\\clp\\cost_estimation_rules.clp";
+        cost_estimation_rules_clp    = path + "\\clp\\fuzzy_cost_estimation_rules.clp";
         mass_budget_rules_clp        = path + "\\clp\\mass_budget_rules.clp";
         subsystem_mass_budget_rules_clp = path + "\\clp\\subsystem_mass_budget_rules.clp";
         deltaV_budget_rules_clp = path + "\\clp\\deltaV_budget_rules.clp";
