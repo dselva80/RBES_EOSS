@@ -302,12 +302,15 @@ public class GenericTask implements Callable {
             r.eval("(run)");
             
             double cost = 0.0;
+            FuzzyValue fzcost = new FuzzyValue("Cost", new Interval("delta",0,0),"FY04$M");
             ArrayList<Fact> missions = qb.makeQuery("MANIFEST::Mission");
             for (int i = 0;i<missions.size();i++)  {
                 cost = cost + missions.get(i).getSlotValue("lifecycle-cost#").floatValue(r.getGlobalContext());
+                fzcost.add((FuzzyValue)missions.get(i).getSlotValue("lifecycle-cost").javaObjectValue(r.getGlobalContext()));
             }
             
             res.setCost(cost);
+            res.setFuzzy_cost(fzcost);
             if(debug)
                 res.setCost_facts(missions);
         } catch(Exception e) {
