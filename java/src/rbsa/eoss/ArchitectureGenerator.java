@@ -157,7 +157,6 @@ public class ArchitectureGenerator {
                 }
                 Architecture new_one = new Architecture(arch,Params.norb,Params.ninstr,pop1.get(k).getNsats());
                 new_one.setEval_mode("DEBUG");
-                pop2.add(new_one);
             }
         }
         
