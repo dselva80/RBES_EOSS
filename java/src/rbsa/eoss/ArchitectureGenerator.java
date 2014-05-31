@@ -115,10 +115,13 @@ public class ArchitectureGenerator {
         //Remove duplicates
         
         ArrayList<Architecture> pop1 = new ArrayList<Architecture>(); 
-        for (Architecture arch1:pop0) {
+        for (int i = 0;i<pop0.size()-1;i++) {
+            Architecture arch1 = pop0.get(i);
             boolean UNIQUE = true;
-            for (Architecture arch2:pop0) {
-                if (arch1.getId() != arch2.getId() && arch1.compareTo(arch2) == 0) {
+            for (int j = i+1;j<pop0.size();j++) {
+                Architecture arch2 = pop0.get(j);
+                if (!arch1.getId().equalsIgnoreCase(arch2.getId()) && arch1.compareTo(arch2) == 0) {
+                    //System.out.println("Eliminating duplicate a1 = " + arch1.getId() + " " + arch1.toString() + " a2 = " + arch2.getId() + " " + arch2.toString());
                     UNIQUE = false;
                     break;
                 }
@@ -131,10 +134,17 @@ public class ArchitectureGenerator {
         ArrayList<Architecture> pop2  = new ArrayList<Architecture>();
         int nvars = pop1.get(0).getBitString().length;
         for (Architecture arch:pop1) {
-            if (arch.getNsats()>1)
-                pop2.add(new Architecture(arch.getBitString(),Params.norb,Params.ninstr,arch.getNsats()-1));
-            if (arch.getNsats()<Params.nsats[Params.nsats.length-1])
-                pop2.add(new Architecture(arch.getBitString(),Params.norb,Params.ninstr,arch.getNsats()+1));
+            Architecture newarch;
+            if (arch.getNsats()>1) {
+                newarch = new Architecture(arch.getBitString(),Params.norb,Params.ninstr,arch.getNsats()-1);
+                newarch.setEval_mode("DEBUG");
+                pop2.add(newarch);
+            }
+            if (arch.getNsats()<Params.nsats[Params.nsats.length-1]) {
+                newarch = new Architecture(arch.getBitString(),Params.norb,Params.ninstr,arch.getNsats()+1);
+                newarch.setEval_mode("DEBUG");
+                pop2.add(newarch);
+            }
         }
         for (int k = 0;k<n1;k++) {
             //System.out.println("Searching around arch " + k);
@@ -146,7 +156,7 @@ public class ArchitectureGenerator {
                     arch[j] = true;
                 }
                 Architecture new_one = new Architecture(arch,Params.norb,Params.ninstr,pop1.get(k).getNsats());
-                pop2.add(new_one);
+                new_one.setEval_mode("DEBUG");
             }
         }
         
@@ -155,7 +165,7 @@ public class ArchitectureGenerator {
         for (Architecture arch1:pop2) {
             boolean UNIQUE = true;
             for (Architecture arch2:pop2) {
-                if (arch1.getId() != arch2.getId() && arch1.compareTo(arch2) == 0) {
+                if (!arch1.getId().equalsIgnoreCase(arch2.getId()) && arch1.compareTo(arch2) == 0) {
                     UNIQUE = false;
                     break;
                 }

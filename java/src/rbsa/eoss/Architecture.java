@@ -567,7 +567,9 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
     //CompareTo
     @Override
     public int compareTo(Architecture other) {
-        return this.toBitString().compareTo(other.toBitString());
+        if(this.toBitString().compareTo(other.toBitString()) == 0 && this.getNsats() == other.getNsats())
+            return 0;
+        else return 1;
     }
     public static Comparator<Architecture> ArchCrowdDistComparator = new Comparator<Architecture>() {
         @Override
