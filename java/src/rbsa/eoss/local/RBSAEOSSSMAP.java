@@ -38,10 +38,10 @@ public class RBSAEOSSSMAP {
     public static void main(String[] args) {
         
         //PATH
-        //String path  = "C:\\Users\\DS925\\Documents\\GitHub\\RBES_EOSS";//RBES SMAP for IEEEAero14 code
-        String path  = "C:\\Users\\Ana-Dani\\Documents\\GitHub\\RBES_EOSS";
+        String path  = "C:\\Users\\DS925\\Documents\\GitHub\\RBES_EOSS";//RBES SMAP for IEEEAero14 code
+        //String path  = "C:\\Users\\Ana-Dani\\Documents\\GitHub\\RBES_EOSS";
         
-        int MODE = 1;
+        int MODE = 2;
         ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
         ArchTradespaceExplorer ATE = ArchTradespaceExplorer.getInstance();
         ResultManager RM = ResultManager.getInstance();
@@ -49,7 +49,7 @@ public class RBSAEOSSSMAP {
         String search_clps = "";
         switch(MODE) {
             case 1: //1 arch
-                params = new Params( path, "CRISP-ATTRIBUTES", "test","normal",search_clps);//FUZZY or CRISP
+                params = new Params( path, "FUZZY-ATTRIBUTES", "test","normal",search_clps);//FUZZY or CRISP
                 AE.init(1);
                 Architecture arch = ArchitectureGenerator.getInstance().getTestArch();
                 Result result1 = AE.evaluateArchitecture(arch,"Fast");
@@ -60,9 +60,9 @@ public class RBSAEOSSSMAP {
                 System.out.println("DONE");
                 break;
             case 2://Full factorial 7 CPUS with random population
-                params = new Params( path, "CRISP-ATTRIBUTES", "test","normal",search_clps);//FUZZY or CRISP
+                params = new Params( path, "FUZZY-ATTRIBUTES", "test","normal",search_clps);//FUZZY or CRISP
                 ArrayList<Architecture> population = ArchitectureGenerator.getInstance().generateRandomPopulation( 50 );
-                AE.init(7);
+                AE.init(3);
                 AE.setPopulation( population );
                 AE.evalMinMax();
                 AE.evaluatePopulation();  

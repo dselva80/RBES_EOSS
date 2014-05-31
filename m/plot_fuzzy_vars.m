@@ -18,10 +18,10 @@ function h = plot_fuzzy_vars(fzx,fzy)
    end
    h=ploterr(x,y,{errxD,errxU},{erryD,erryU},'r.');
    set(h(2),'Color','b'), set(h(3),'Color','b'), set(h(1),'MarkerSize',15), set(h(1),'MarkerFaceColor','r');
-   xlabel([char(fzx{1}.getParam) ' (' char(fzx{1}.getUnit) ')'],'FontSize',18);
-   ylabel([char(fzy{1}.getParam) ' (' char(fzy{1}.getUnit) ')'],'FontSize',18);
-   set(gca,'FontSize',18);
+   xlabel([char(fzx{1}.getParam) ' (' char(fzx{1}.getUnit) ')']);
+   ylabel([char(fzy{1}.getParam) ' (' char(fzy{1}.getUnit) ')']);
+%    set(gca,'FontSize',18);
    grid on;
-   print('-dmeta','EOCubesats_fuzzy_scores');
-   saveas(gcf, 'EOCubesats_fuzzy_scores', 'fig');
+%    print('-dmeta','EOCubesats_fuzzy_scores');
+%    saveas(gcf, 'EOCubesats_fuzzy_scores', 'fig');
 end

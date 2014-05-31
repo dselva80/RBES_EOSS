@@ -21,8 +21,9 @@ public class Resource {
         r = new Rete();
         qb = new QueryBuilder( r );
         m = new MatlabFunctions(this);
-        JessInitializer.getInstance().initializeJess( r, qb, m );
         r.addUserfunction(m);
+        JessInitializer.getInstance().initializeJess( r, qb, m );
+        
     }
     
     public Rete getRete()

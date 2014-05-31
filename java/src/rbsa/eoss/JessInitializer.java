@@ -44,6 +44,7 @@ public class JessInitializer {
             // Create global variable path
             String tmp = Params.path.replaceAll("\\\\", "\\\\\\\\");
             r.eval( "(defglobal ?*app_path* = \"" + tmp + "\")" );
+            r.eval("(import rbsa.eoss.*)");
             
             // Load modules
             loadModules( r );
@@ -110,7 +111,7 @@ public class JessInitializer {
             loadSpacecraftDesignRules(r, Params.propulsion_design_rules_clp);
             
             //Load cost estimation rules;
-            loadCostEstimationRules(r, Params.cost_estimation_rules_clp);
+            loadCostEstimationRules(r, new String[]{Params.cost_estimation_rules_clp,Params.fuzzy_cost_estimation_rules_clp});
             
             //Load launch vehicle selection rules
             loadLaunchVehicleSelectionRules(r,Params.launch_vehicle_selection_rules_clp);
@@ -127,7 +128,7 @@ public class JessInitializer {
             } else if (Params.req_mode.equalsIgnoreCase("CRISP-ATTRIBUTES")) {
                 loadRequirementRulesAttribs(r, requirements_xls, "Attributes", m);
             } else if (Params.req_mode.equalsIgnoreCase("FUZZY-ATTRIBUTES")) {
-                loadFuzzyRequirementRulesAttribs(r, requirements_xls, "Requirement rules", m);
+                loadFuzzyRequirementRulesAttribs(r, requirements_xls, "Attributes", m);
             }
             //Load capability rules
             loadCapabilityRules(r,instrument_xls);
@@ -156,17 +157,18 @@ public class JessInitializer {
 
             //Load aggregation rules
             Workbook aggregation_xls = Workbook.getWorkbook( new File( Params.aggregation_xls ) );
-            loadAggregationRules(r, aggregation_xls, "Aggregation rules", Params.aggregation_rules_clp);
+            loadAggregationRules(r, aggregation_xls, "Aggregation rules", new String[]{Params.aggregation_rules_clp,Params.fuzzy_aggregation_rules_clp});
             
             
             
             r.reset();
-            r.eval("(import rbsa.eoss.*)");
+            
             //Create precomputed queries;
             load_precompute_queries(qb);
         
         } catch (Exception e) {
             System.out.println( "EXC in InitializerJess " +e.getClass() + " : " + e.getMessage() );
+            e.printStackTrace();
         }
     }
     private void load_precompute_queries(QueryBuilder qb) {
@@ -346,9 +348,8 @@ public class JessInitializer {
              r.addUserfunction(new SameOrBetter());
              r.addUserfunction(new Improve());
              r.addUserfunction(new Worsen());
-             
-             for (int i = 0;i<clps.length;i++)  {
-                 r.batch(clps[i]);
+             for (String clp : clps) {
+                 r.batch(clp);
              }    
              r.eval("(deffunction update-objective-variable (?obj ?new-value) \"Update the value of the global variable with the new value only if it is better \" (bind ?obj (max ?obj ?new-value)))");
              r.eval("(deffunction ContainsRegion (?observed-region ?desired-region)  \"Returns true if the observed region i.e. 1st param contains the desired region i.e. 2nd param \" (bind ?tmp1 (eq ?observed-region Global)) (bind ?tmp2 (eq ?desired-region ?observed-region)) (if (or ?tmp1 ?tmp2) then (return TRUE) else (return FALSE)))");
@@ -878,11 +879,12 @@ public class JessInitializer {
                         String[] tokens = current_subobj.split("-",2);// limit = 2 so that remain contains RegionofInterest Global
                         String parent = tokens[0];
                         String index = tokens[1];
-                        call2 = call2 + " (AGGREGATION::SUBOBJECTIVE (satisfaction 0.0) (fuzzy-value (new FuzzyValue \\\"Value\\\" 0.0 0.0 0.0 \\\"utils\\\" (MatlabFunctions getValue_inv_hashmap))) (id " + current_subobj + ") (index " + index + ") (parent " + parent + ") (reasons (create$ " + StringUtils.repeat("N-A ",nattrib) + " ))) ";
+                        call2 = call2 + " (AGGREGATION::SUBOBJECTIVE (satisfaction 0.0) (fuzzy-value (new FuzzyValue \"Value\" 0.0 0.0 0.0 \"utils\" (MatlabFunctions getValue_inv_hashmap))) (id " + current_subobj + ") (index " + index + ") (parent " + parent + ") (reasons (create$ " + StringUtils.repeat("N-A ",nattrib) + " ))) ";
                         String rhs0 = ") => (bind ?reason \"\") (bind ?new-reasons (create$ "  + StringUtils.repeat("N-A ",nattrib) + "))";
                         req_rule = lhs + rhs0 + rhs + rhs2 + ")) (assert (AGGREGATION::SUBOBJECTIVE (id " + current_subobj + ") (attributes " + attribs + ") (index " + index + ") (parent " + parent + " ) "
-                                + "(attrib-scores ?list) (satisfaction (*$ ?list)) (fuzzy-value (new FuzzyValue \"Value\" (call (new FuzzyValue \"Value\" (new Interval \"interval\" (*$ ?list) (*$ ?list))" +
-"                        + \") \"utils\" (MatlabFunctions getValue_hashmap)) getFuzzy_val) \"utils\" (MatlabFunctions getValue_inv_hashmap))) "
+                                + "(attrib-scores ?list) (satisfaction (*$ ?list)) (fuzzy-value (new FuzzyValue \"Value\" (call "
+                                + "(new FuzzyValue \"Value\" (new Interval \"interval\" (*$ ?list) (*$ ?list)) \"utils\" "
+                                + "(MatlabFunctions getValue_hashmap)) getFuzzy_val) \"utils\" (MatlabFunctions getValue_inv_hashmap))) "
                                 + " (reasons ?new-reasons) (satisfied-by ?whom) (reason ?reason )))";
                         req_rule = req_rule + ")";
                         Params.requirement_rules.put(current_subobj,subobj_tests);
@@ -903,7 +905,7 @@ public class JessInitializer {
                         rhs = "";
                         rhs2 = " (bind ?list (create$ ";
                         attribs = "";
-                        lhs = "(defrule REQUIREMENTS::"  + subobj + "-attrib ?m <- (REQUIREMENTS::Measurement (taken-by ?whom) (Parameter " + param + ")";
+                        lhs = "(defrule FUZZY-REQUIREMENTS::"  + subobj + "-attrib ?m <- (REQUIREMENTS::Measurement (taken-by ?whom) (Parameter " + param + ")";
                         current_subobj = subobj;
                         current_param = param;
                         subobj_tests = new HashMap();
@@ -933,9 +935,16 @@ public class JessInitializer {
             String[] tokens = current_subobj.split("-",2);// limit = 2 so that remain contains RegionofInterest Global
             String parent = tokens[0];
             String index = tokens[1];
-            call2 = call2 + " (AGGREGATION::SUBOBJECTIVE (satisfaction 0.0) (id " + current_subobj + ") (index " + index + ") (parent " + parent + ") (reasons (create$ " + StringUtils.repeat("N-A ",nattrib) + " ))) ";
+            call2 = call2 + " (AGGREGATION::SUBOBJECTIVE (satisfaction 0.0) (fuzzy-value "
+                    + "(new FuzzyValue \"Value\" 0.0 0.0 0.0 \"utils\" (MatlabFunctions getValue_inv_hashmap)))"
+                    + " (id " + current_subobj + ") (index " + index + ") (parent " + parent + ") "
+                    + "(reasons (create$ " + StringUtils.repeat("N-A ",nattrib) + " ))) ";
             String rhs0 = ") => (bind ?reason \"\") (bind ?new-reasons (create$ "  + StringUtils.repeat("N-A ",nattrib) + "))";
-            req_rule = lhs + rhs0 + rhs + rhs2 + ")) (assert (AGGREGATION::SUBOBJECTIVE (id " + current_subobj + ") (attributes " + attribs + ") (index " + index + ") (parent " + parent + " ) (attrib-scores ?list) (satisfaction (*$ ?list)) (reasons ?new-reasons) (satisfied-by ?whom) (reason ?reason )))";
+            req_rule = lhs + rhs0 + rhs + rhs2 + ")) (assert (AGGREGATION::SUBOBJECTIVE (id " + current_subobj + ") (attributes " + attribs + ") (index " + index + ") (parent " + parent + " ) "
+                                + "(attrib-scores ?list) (satisfaction (*$ ?list)) (fuzzy-value (new FuzzyValue \"Value\" (call "
+                                + "(new FuzzyValue \"Value\" (new Interval \"interval\" (*$ ?list) (*$ ?list)) \"utils\" "
+                                + "(MatlabFunctions getValue_hashmap)) getFuzzy_val) \"utils\" (MatlabFunctions getValue_inv_hashmap))) "
+                                + " (reasons ?new-reasons) (satisfied-by ?whom) (reason ?reason )))";
             req_rule = req_rule + ")";
 
             r.eval(req_rule);
@@ -944,7 +953,8 @@ public class JessInitializer {
             call2= call2 + ")";
             r.eval(call2);
          }catch (Exception e) {
-            System.out.println( "EXC in loadRequirementRulesAttribs " +e.getMessage() );
+            System.out.println( "EXC in loadFuzzyRequirementRulesAttribs " +e.getMessage() );
+            e.printStackTrace();
         }
      }
      
@@ -1224,9 +1234,10 @@ public class JessInitializer {
              System.out.println( "EXC in loadSynergyRules " +e.getMessage() );
          }     
      }
-     private void loadAggregationRules (Rete r, Workbook xls, String sheet, String clp) {
+     private void loadAggregationRules (Rete r, Workbook xls, String sheet, String[] clps) {
          try {
-             r.batch(clp);
+             for (String clp:clps)
+                r.batch(clp);
              Sheet meas = xls.getSheet(sheet);
              
              //Stakeholders or panels
@@ -1350,9 +1361,10 @@ public class JessInitializer {
              System.out.println( "EXC in loadEpsDesignRules " +e.getMessage() );
          }  
      }
-     private void loadCostEstimationRules (Rete r, String clp) {
+     private void loadCostEstimationRules (Rete r, String[] clps) {
          try {
-             r.batch(clp);
+             for (String clp:clps)
+                r.batch(clp);
          } catch(Exception e) {
              System.out.println( "EXC in loadCostEstimationRules " +e.getMessage() );
          }  

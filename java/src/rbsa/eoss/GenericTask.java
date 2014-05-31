@@ -157,16 +157,23 @@ public class GenericTask implements Callable {
             r.setFocus( "SYNERGIES-ACROSS-ORBITS" );
             r.run();
             
-            r.setFocus( "REQUIREMENTS" );
+            if ((Params.req_mode.equalsIgnoreCase("FUZZY-CASES")) || (Params.req_mode.equalsIgnoreCase("FUZZY-ATTRIBUTES")))
+                r.setFocus( "FUZZY-REQUIREMENTS" );
+            else
+                r.setFocus( "REQUIREMENTS" );
             r.run();
             
-            r.setFocus( "AGGREGATION" );
+            if ((Params.req_mode.equalsIgnoreCase("FUZZY-CASES")) || (Params.req_mode.equalsIgnoreCase("FUZZY-ATTRIBUTES")))
+                r.setFocus( "FUZZY-AGGREGATION" );
+            else
+                r.setFocus( "AGGREGATION" );
             r.run();
-            if ((Params.req_mode.equalsIgnoreCase("CRISP-ATTRIBUTES")) || (Params.req_mode.equalsIgnoreCase("FUZZY-ATTRIBUTES"))) {
+            
+            if ((Params.req_mode.equalsIgnoreCase("CRISP-ATTRIBUTES")) || (Params.req_mode.equalsIgnoreCase("FUZZY-ATTRIBUTES"))) 
                 result = aggregate_performance_score_facts(r, m, qb);
-            } else if ((Params.req_mode.equalsIgnoreCase("CRISP-CASES")) || (Params.req_mode.equalsIgnoreCase("FUZZY-CASES"))){
+             else if ((Params.req_mode.equalsIgnoreCase("CRISP-CASES")) || (Params.req_mode.equalsIgnoreCase("FUZZY-CASES")))
                 result = aggregate_performance_score(r);
-            }
+            
 
             
             
@@ -183,12 +190,15 @@ public class GenericTask implements Callable {
        ArrayList panel_scores = new ArrayList();
        double science = 0.0;
        double cost = 0.0;
+       FuzzyValue fuzzy_science = null;
+       FuzzyValue fuzzy_cost = null;
        TreeMap<String,ArrayList<Fact>> explanations = new TreeMap<String,ArrayList<Fact>>();
        TreeMap<String,Double> tm = new TreeMap<String,Double>();
        try {
            ArrayList<Fact> vals = qb.makeQuery("AGGREGATION::VALUE");
            Fact val = vals.get(0);
            science = val.getSlotValue("satisfaction").floatValue(r.getGlobalContext());
+           fuzzy_science = (FuzzyValue)val.getSlotValue("fuzzy-value").javaObjectValue(r.getGlobalContext());
            panel_scores = m.JessList2ArrayList(val.getSlotValue("sh-scores").listValue(r.getGlobalContext()),r);
            
            ArrayList<Fact> subobj_facts = qb.makeQuery("AGGREGATION::SUBOBJECTIVE");
@@ -209,7 +219,7 @@ public class GenericTask implements Callable {
                 System.out.println(e.getMessage() + " " + e.getClass() + " " + e.getStackTrace());
                 e.printStackTrace();
             }
-       Result theresult = new Result(arch, science, cost, subobj_scores, obj_scores, panel_scores,tm);
+       Result theresult = new Result(arch, science, cost, fuzzy_science, fuzzy_cost, subobj_scores, obj_scores, panel_scores,tm);
        if(debug) {
            theresult.setCapabilities(qb.makeQuery("REQUIREMENTS::Measurement"));
            theresult.setExplanations(explanations);
@@ -298,7 +308,10 @@ public class GenericTask implements Callable {
             r.eval("(focus LV-SELECTION3)");
             r.eval("(run)");
             
-            r.eval("(focus COST-ESTIMATION)");
+            if ((Params.req_mode.equalsIgnoreCase("FUZZY-CASES")) || (Params.req_mode.equalsIgnoreCase("FUZZY-ATTRIBUTES")))
+                r.eval("(focus FUZZY-COST-ESTIMATION)");
+            else
+                r.eval("(focus COST-ESTIMATION)");
             r.eval("(run)");
             
             double cost = 0.0;
@@ -306,7 +319,7 @@ public class GenericTask implements Callable {
             ArrayList<Fact> missions = qb.makeQuery("MANIFEST::Mission");
             for (int i = 0;i<missions.size();i++)  {
                 cost = cost + missions.get(i).getSlotValue("lifecycle-cost#").floatValue(r.getGlobalContext());
-                fzcost.add((FuzzyValue)missions.get(i).getSlotValue("lifecycle-cost").javaObjectValue(r.getGlobalContext()));
+                fzcost = fzcost.add((FuzzyValue)missions.get(i).getSlotValue("lifecycle-cost").javaObjectValue(r.getGlobalContext()));
             }
             
             res.setCost(cost);

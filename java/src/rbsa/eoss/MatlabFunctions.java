@@ -18,6 +18,8 @@ import jess.*;
 public class MatlabFunctions implements Userfunction {
     private HashMap<String,Interval> value_inv_hashmap;
     private HashMap<Interval,String> value_hashmap;
+    private Value vvalue_inv_hashmap;
+    private Value vvalue_hashmap;
     private HashMap<Integer,Double> infFactors;
     private ValueVector instrument_list;
     private Resource res;
@@ -39,6 +41,7 @@ public class MatlabFunctions implements Userfunction {
         value_inv_hashmap.put("Half",new Interval("interval",0.4,0.6));
         value_inv_hashmap.put("Some",new Interval("interval",0.33,0.5));
         value_inv_hashmap.put("Marginal",new Interval("interval",0.0,0.33));
+        vvalue_inv_hashmap = new Value(value_inv_hashmap);
         
         value_hashmap = new HashMap<Interval,String>(5);
         value_hashmap.put(new Interval("interval",1.0,1.0),"Full");
@@ -46,6 +49,7 @@ public class MatlabFunctions implements Userfunction {
         value_hashmap.put(new Interval("interval",0.4,0.6),"Half");
         value_hashmap.put(new Interval("interval",0.33,0.5),"Some");
         value_hashmap.put(new Interval("interval",0.0,0.33),"Marginal");
+        vvalue_hashmap = new Value(value_hashmap);
         
         lv_database = new HashMap<String,LaunchVehicle>();
         
@@ -73,6 +77,7 @@ public class MatlabFunctions implements Userfunction {
             return v;
         } catch (Exception e) {
             System.out.println( e.getMessage() );
+            e.printStackTrace();
             return null;
         }
     }
@@ -109,12 +114,12 @@ private void initializeInflationFactors()
         for( int i = 1930, j = 0; i<= 2019; i++, j++ )
             infFactors.put(new Integer(i), new Double(tmp[j]));
     }
-    public HashMap<String, Interval> getValue_inv_hashmap() {
-        return value_inv_hashmap;
+    public Value getValue_inv_hashmap(Funcall vv, Context c) {
+        return vvalue_inv_hashmap;
     }
 
-    public HashMap<Interval, String> getValue_hashmap() {
-        return value_hashmap;
+    public Value getValue_hashmap(Funcall vv, Context c) {
+        return vvalue_hashmap;
     }
     
     public String StringArraytoStringWithSpaces(String[] array) {

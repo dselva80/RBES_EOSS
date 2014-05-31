@@ -318,7 +318,7 @@ public class Result implements java.io.Serializable {
     }
     @Override
     public String toString() {
-        return "Result{" + "science=" + science + ", cost=" + cost + ", arch=" + arch.toString() + ", paretoRanking=" + paretoRanking + '}';
+        return "Result{" + "science=" + science + ", cost=" + cost + " fuz_sc=" + fuzzy_science.toString() + " fuz_co=" + fuzzy_cost.toString() + ", arch=" + arch.toString() + ", paretoRanking=" + paretoRanking + '}';
     }
    
 }

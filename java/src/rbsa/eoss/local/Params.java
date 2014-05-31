@@ -37,6 +37,7 @@ public class Params {
     public static String[] functions_clp = new String[2];// used
     public static String assimilation_rules_clp;// used
     public static String aggregation_rules_clp;// used
+    public static String fuzzy_aggregation_rules_clp;//used
     public static String jess_queries_clp;
     public static String enumeration_rules_clp;
     public static String manifest_rules_clp;
@@ -55,6 +56,7 @@ public class Params {
     public static String value_aggregation_clp;
     public static String requirement_satisfaction_clp;
     public static String cost_estimation_rules_clp;
+    public static String fuzzy_cost_estimation_rules_clp;
     public static String mass_budget_rules_clp;
     public static String subsystem_mass_budget_rules_clp;
     public static String deltaV_budget_rules_clp;
@@ -166,6 +168,7 @@ public class Params {
         functions_clp[1]           = path + "\\clp\\functions.clp";//used
         assimilation_rules_clp       = path + "\\clp\\assimilation_rules.clp";//used
         aggregation_rules_clp       = path + "\\clp\\aggregation_rules.clp";//used
+        fuzzy_aggregation_rules_clp  = path + "\\clp\\fuzzy_aggregation_rules.clp";//used
         jess_queries_clp             = path + "\\clp\\queries.clp";//Absent in SMAP
         enumeration_rules_clp        = path + "\\clp\\enumeration_rules.clp";
         manifest_rules_clp           = path + "\\clp\\manifest_rules.clp";
@@ -180,7 +183,8 @@ public class Params {
         fuzzy_attribute_clp          = path + "\\clp\\fuzzy_attribute_rules.clp";
         value_aggregation_clp        = path + "\\clp\\requirement_rules.clp";
         requirement_satisfaction_clp = path + "\\clp\\aggregation_rules.clp";
-        cost_estimation_rules_clp    = path + "\\clp\\fuzzy_cost_estimation_rules.clp";
+        cost_estimation_rules_clp    = path + "\\clp\\cost_estimation_rules.clp";
+        fuzzy_cost_estimation_rules_clp    = path + "\\clp\\fuzzy_cost_estimation_rules.clp";
         mass_budget_rules_clp        = path + "\\clp\\mass_budget_rules.clp";
         subsystem_mass_budget_rules_clp = path + "\\clp\\subsystem_mass_budget_rules.clp";
         deltaV_budget_rules_clp = path + "\\clp\\deltaV_budget_rules.clp";

@@ -9,6 +9,8 @@
 (defmodule SYNERGIES-ACROSS-ORBITS)
 (defmodule REQUIREMENTS)
 (defmodule FUZZY-REQUIREMENTS)
+(defmodule FUZZY-AGGREGATION)
+(defmodule FUZZY-COST-ESTIMATION)
 (defmodule REASONING)
 (defmodule ORBIT-SELECTION)
 (defmodule ORBIT)

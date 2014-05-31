@@ -22,7 +22,7 @@ function varargout = GUI_explanation_facility(varargin)
 
 % Edit the above text to modify the response to help GUI_explanation_facility
 
-% Last Modified by GUIDE v2.5 25-May-2014 17:53:02
+% Last Modified by GUIDE v2.5 31-May-2014 15:55:26
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -151,79 +151,108 @@ grp_fcn = get( handles.txtGroupFunction, 'String' );
 tmp = get( handles.comboParetoFront, 'String' );
 pareto = get( handles.comboParetoFront, 'Value' );
 pareto = tmp{pareto};
+
+tmp2 = get( handles.fuzzy_crisp_scores, 'String' );
+fuzzy = get( handles.fuzzy_crisp_scores, 'Value' );
+fuzzy = tmp2{fuzzy};
+
 if strcmp( pareto, 'Yes' )
     pareto = true;
 else
     pareto = false;
 end
-RBES_plot25( handles, handles.axes, archs, results, {x_var,y_var}, grp_fcn, pareto );
+if strcmp( fuzzy, 'Fuzzy' )
+    fuzzy = true;
+else
+    fuzzy = false;
+end
+RBES_plot25( handles, handles.axes, archs, results, {x_var,y_var}, grp_fcn, pareto, fuzzy);
 
-function RBES_plot25(handles,ax,archs,results, inaxis,filter_func,PARETO)
+function RBES_plot25(handles,ax,archs,results, inaxis,filter_func,PARETO, FUZZY)
     
     cla(ax);
-    MARKERS = {'x','o','d','s','p','.',... 
+    if FUZZY
+        narch = length(archs);
+        xvals = zeros(narch,1);
+        yvals = zeros(narch,1);
+        for i = 1:narch
+            xvals(i) = results.get(i-1).getScience;
+            yvals(i) = results.get(i-1).getCost;
+        end
+        [x_pareto, y_pareto, inds, ~ ] = pareto_front([xvals yvals] , {'LIB', 'SIB'});
+        narchfront = length(inds);
+        pareto_archs = archs(inds);
+        fuzzyxvals = cell(narchfront,1);
+        fuzzyyvals = cell(narchfront,1);
+        for i = 1:narchfront
+            fuzzyxvals{i} = pareto_archs{i}.getResult.getFuzzy_science();
+            fuzzyyvals{i} = pareto_archs{i}.getResult.getFuzzy_cost();
+        end
+        plot_fuzzy_vars(fuzzyxvals,fuzzyyvals);
+        xlim( [0 1] );
+        ylim( [0 Inf] );
+        plot( x_pareto, y_pareto, '--or','Parent',ax,'ButtonDownFcn',  {@axes_ButtonDownFcn,pareto_archs,x_pareto,y_pareto,handles});
+        
+    else
+        MARKERS = {'x','o','d','s','p','.',... 
                 'x','o','d','s','p','.',...
                 'x','o','d','s','p','.',...
                 'x','o','d','s','p','.',...
                 'x','o','d','s','p','.'};
             
-    COLORS = {'b','m','k','g','c','y',...
-                'm','k','g','c','y','b',...
-                'k','g','c','y','b','m',...
-                'g','c','y','b','m','k',...
-                'c','y','b','m','k','g'};
-    narch = length(archs);
-    xvals = zeros(narch,1);
-    yvals = zeros(narch,1);
-%     fuzzyxvals = cell(narch,1);
-    fuzzyyvals = cell(narch,1);
-    for i = 1:narch
-        xvals(i) = results.get(i-1).getScience;
-        yvals(i) = results.get(i-1).getCost;
-%         fuzzyxvals{i} = results.get(i-1).getFuzzy_science();
-        fuzzyyvals{i} = results.get(i-1).getFuzzy_cost();
-    end
-    if isempty(filter_func) || strcmp(filter_func,'') || strcmp(filter_func,' ')
-        labels = {'Architectures','Pareto Front'};
-        vals = ones(narch,1);
-        labels_map = java.util.HashMap;
-    else
-        eval(['[~,labels_map] = ' filter_func '(archs{1});']);
-        if PARETO
-            labels = {'Pareto front'};
-        else
-            labels = {};
+        COLORS = {'b','m','k','g','c','y',...
+                    'm','k','g','c','y','b',...
+                    'k','g','c','y','b','m',...
+                    'g','c','y','b','m','k',...
+                    'c','y','b','m','k','g'};
+        narch = length(archs);
+        xvals = zeros(narch,1);
+        yvals = zeros(narch,1);
+        for i = 1:narch
+            xvals(i) = results.get(i-1).getScience;
+            yvals(i) = results.get(i-1).getCost;
         end
-        vals = cellfun(str2func(filter_func),archs);
-    end
-    unique_vals = unique(vals);
-    n = length(unique_vals);
-    indexes = cell(n,1);
-    markers = MARKERS(1:length(unique_vals));
-    colors = COLORS(1:length(unique_vals));
-    if PARETO
-        [x_pareto, y_pareto, inds, ~ ] = pareto_front([xvals yvals] , {'LIB', 'SIB'});
-        set( handles.num_archs_pf,'String', num2str(length(inds)) );
-        plot( x_pareto, y_pareto, 'r--','Parent',ax,'ButtonDownFcn',  {@axes_ButtonDownFcn,archs(inds),x_pareto,y_pareto,handles});
-    end
-    hold on;
-    for i = 1 : n
-        indexes{i} = (vals == unique_vals(i));
-        labels = [labels;labels_map.get(unique_vals(i))]; 
-        scatter(xvals(indexes{i}),yvals(indexes{i}),'Marker',markers{i},'MarkerEdgeColor',colors{i},...
-                'Parent',ax,'ButtonDownFcn', {@axes_ButtonDownFcn,archs(indexes{i}),xvals(indexes{i}),yvals(indexes{i}),handles});
-        
+        if isempty(filter_func) || strcmp(filter_func,'') || strcmp(filter_func,' ')
+            labels = {'Architectures','Pareto Front'};
+            vals = ones(narch,1);
+            labels_map = java.util.HashMap;
+        else
+            eval(['[~,labels_map] = ' filter_func '(archs{1});']);
+            if PARETO
+                labels = {'Pareto front'};
+            else
+                labels = {};
+            end
+            vals = cellfun(str2func(filter_func),archs);
+        end
+        unique_vals = unique(vals);
+        n = length(unique_vals);
+        indexes = cell(n,1);
+        markers = MARKERS(1:length(unique_vals));
+        colors = COLORS(1:length(unique_vals));
+        if PARETO
+            [x_pareto, y_pareto, inds, ~ ] = pareto_front([xvals yvals] , {'LIB', 'SIB'});
+            set( handles.num_archs_pf,'String', num2str(length(inds)) );
+            plot( x_pareto, y_pareto, 'r--','Parent',ax,'ButtonDownFcn',  {@axes_ButtonDownFcn,archs(inds),x_pareto,y_pareto,handles});
+        end
         hold on;
+        xlim( [0 1] );
+        ylim( [0 Inf] );
+        for i = 1 : n
+            indexes{i} = (vals == unique_vals(i));
+            labels = [labels;labels_map.get(unique_vals(i))]; 
+            scatter(xvals(indexes{i}),yvals(indexes{i}),'Marker',markers{i},'MarkerEdgeColor',colors{i},...
+                    'Parent',ax,'ButtonDownFcn', {@axes_ButtonDownFcn,archs(indexes{i}),xvals(indexes{i}),yvals(indexes{i}),handles});
+
+            hold on;
+        end
+       
+
+        grid on;
+        xlabel(inaxis{1});
+        ylabel(inaxis{2});
+        legend(labels,'Location','Best');
     end
-   xlim( [0 1] );
-%    ylim( [0 1] );
-    
-    grid on;
-    xlabel(inaxis{1});
-    ylabel(inaxis{2});
-    legend(labels,'Location','Best');
-%     set(gca,'FontSize',20);
-%     print('-dpng',['science_cost_' incolor]);
 
 function axes_ButtonDownFcn(src,eventdata,archs,x,y,handles)
 
@@ -738,7 +767,7 @@ set( handles.comboxVar, 'String', [{'benefit','lifecycle-cost','fuzzy-cost'}] );
 set( handles.comboyVar, 'String', [{'lifecycle-cost','benefit','fuzzy-cost'}] );
 % Set the combobox for pareto front
 set( handles.comboParetoFront, 'String', {'Yes','No'} );
-
+set( handles.fuzzy_crisp_scores, 'String', {'Crisp','Fuzzy'} );
 % Compute extra information needed
 %compute_other_metrics(metrics);
 
@@ -835,6 +864,29 @@ function txtCapaFile_CreateFcn(hObject, eventdata, handles)
 % handles    empty - handles not created until after all CreateFcns called
 
 % Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in fuzzy_crisp_scores.
+function fuzzy_crisp_scores_Callback(hObject, eventdata, handles)
+% hObject    handle to fuzzy_crisp_scores (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns fuzzy_crisp_scores contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from fuzzy_crisp_scores
+
+
+% --- Executes during object creation, after setting all properties.
+function fuzzy_crisp_scores_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fuzzy_crisp_scores (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');

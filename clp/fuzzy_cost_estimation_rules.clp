@@ -2,20 +2,6 @@
 ; Payload cost (salience 20)
 ; ********************
 
-;(defrule COST-ESTIMATION::estimate-payload-cost
-;    "This rule estimates payload cost using a very simplified version of the 
-;    NASA Instrument Cost Model available on-line"
-;    (declare (salience 20))
-;    ?miss <- (MANIFEST::Mission (payload-cost# nil) (payload-mass# ?m&~nil)
-;        (payload-power# ?p&~nil) (payload-data-rate# ?rb&~nil) (developed-by ?whom)
-;        )
-;    =>
-;    (bind ?cost (* 25600 (** (/ ?p 61.5) 0.32) (** (/ ?m 53.8) 0.26) 
-;            (** (/ (* 1000 ?rb) 40.4) 0.11))); in FY04$
-;    (bind ?cost (/ ?cost 1.097)); correct for inflation from FY04 to FY00, from http://oregonstate.edu/cla/polisci/faculty-research/sahr/cv2000.pdf
-;    (modify ?miss (payload-cost# ?cost))
-;    )
-
 (deffunction is-domestic (?who)
     (return (eq (sub-string 1 3 ?who) "DOM"))
     )
@@ -38,7 +24,7 @@
     (return ?cost)
     )
 
-(defrule COST-ESTIMATION::estimate-instrument-cost
+(defrule FUZZY-COST-ESTIMATION::estimate-instrument-cost
     "This rule estimates payload cost using a very simplified version of the 
     NASA Instrument Cost Model available on-line"
     (declare (salience 25) (no-loop TRUE))
@@ -53,7 +39,7 @@
 
 
 
-(defrule COST-ESTIMATION::estimate-payload-cost2
+(defrule FUZZY-COST-ESTIMATION::estimate-payload-cost2
     "This rule estimates payload cost using a very simplified version of the 
     NASA Instrument Cost Model available on-line"
     (declare (salience 18))
@@ -76,7 +62,7 @@
 ; ********************
 
 ; bus non recurring cost
-(defrule COST-ESTIMATION::estimate-bus-non-recurring-cost
+(defrule FUZZY-COST-ESTIMATION::estimate-bus-non-recurring-cost
     "This rule estimates bus non-recurring cost using SMAD CERs"
     (declare (salience 10))
     ?miss <- (MANIFEST::Mission (bus-non-recurring-cost# nil) 
@@ -109,7 +95,7 @@
     )
 
 ; bus recurring cost
-(defrule COST-ESTIMATION::estimate-bus-TFU-recurring-cost
+(defrule FUZZY-COST-ESTIMATION::estimate-bus-TFU-recurring-cost
     "This rule estimates bus recurring cost (TFU) using SMAD CERs"
     (declare (salience 10))
     ?miss <- (MANIFEST::Mission (bus-recurring-cost# nil) 
@@ -148,7 +134,7 @@
 ; ********************
 
 ; spacecraft recurring and non-recurring s/c cost
-(defrule COST-ESTIMATION::estimate-spacecraft-cost-dedicated
+(defrule FUZZY-COST-ESTIMATION::estimate-spacecraft-cost-dedicated
     "This rule estimates s/c non recurring cost adding up bus and payload n/r cost"
     (declare (salience 5))
     ?miss <- (MANIFEST::Mission (spacecraft-non-recurring-cost# nil) (spacecraft-recurring-cost# nil)
@@ -175,7 +161,7 @@
 ; ********************
 
 ; IA&T cost
-(defrule COST-ESTIMATION::estimate-integration-and-testing-cost
+(defrule FUZZY-COST-ESTIMATION::estimate-integration-and-testing-cost
     "This rule estimates Integration, assembly and testing non recurring and cost using SMAD CERs"
     ?miss <- (MANIFEST::Mission (IAT-non-recurring-cost# nil) (IAT-recurring-cost# nil) (IAT-cost# nil) 
         (spacecraft-non-recurring-cost# ?scnr&~nil) (satellite-dry-mass ?m&~nil)
@@ -197,7 +183,7 @@
 ; ********************
 ; Program overhead cost (salience 0)
 ; ********************
-(defrule COST-ESTIMATION::estimate-program-overhead-cost
+(defrule FUZZY-COST-ESTIMATION::estimate-program-overhead-cost
     "This rule estimates program overhead non recurring and cost using SMAD CERs"
     ?miss <- (MANIFEST::Mission (program-non-recurring-cost# nil) (program-recurring-cost# nil) (program-cost# nil) 
         (spacecraft-non-recurring-cost# ?scnr&~nil) (spacecraft-recurring-cost# ?scr&~nil)
@@ -220,7 +206,7 @@
 ; Operations cost (salience -5)
 ; ********************
 
-(defrule COST-ESTIMATION::estimate-operations-cost-std
+(defrule FUZZY-COST-ESTIMATION::estimate-operations-cost-std
     "This rule estimates operations cost using NASAs MOCM"
     (declare (salience -5))
     ?miss <- (MANIFEST::Mission (satellite-cost# ?sat&~nil) (operations-cost# nil) 
@@ -235,7 +221,7 @@
     )
 
 
-(defrule COST-ESTIMATION::estimate-operations-cost-with-ground-station-penalty
+(defrule FUZZY-COST-ESTIMATION::estimate-operations-cost-with-ground-station-penalty
     "This rule estimates operations cost using NASAs MOCM"
     (declare (salience -5))
     ?miss <- (MANIFEST::Mission (satellite-cost# ?sat&~nil) (operations-cost# nil) 
@@ -285,7 +271,7 @@
       
     (return ?z))
 
-(defrule COST-ESTIMATION::estimate-total-mission-cost-with-overruns
+(defrule FUZZY-COST-ESTIMATION::estimate-total-mission-cost-with-overruns
     "This rule estimates total mission cost adding an overrun which is proportional to 
     the expected schedule slippage, which in turn is a function of the TRL of the less 
     mature instrument in the payload"
@@ -305,7 +291,7 @@
 
 
 
-(defrule COST-ESTIMATION::estimate-total-mission-cost-with-overruns-when-partnership
+(defrule FUZZY-COST-ESTIMATION::estimate-total-mission-cost-with-overruns-when-partnership
     "This rule estimates total mission cost adding an overrun which is proportional to 
     the expected schedule slippage, which in turn is a function of the TRL of the less 
     mature instrument in the payload. Partnerships with internationals are taken into 
@@ -333,7 +319,7 @@
     )
 
 
-(defrule COST-ESTIMATION::estimate-total-mission-cost-non-recurring
+(defrule FUZZY-COST-ESTIMATION::estimate-total-mission-cost-non-recurring
     "Non recurring cost"
     
     (declare (salience -10))
@@ -350,7 +336,7 @@
     (modify ?miss (mission-non-recurring-cost ?fz-mission-cost) (mission-non-recurring-cost# ?mission-cost))
     )
 
-(defrule COST-ESTIMATION::estimate-total-mission-cost-recurring
+(defrule FUZZY-COST-ESTIMATION::estimate-total-mission-cost-recurring
     "Non recurring cost"
     
     (declare (salience -10))
@@ -378,7 +364,7 @@
         (mission-recurring-cost (fuzzysum ?fz-total-cost ?fz-launch)))
     )
 
-(defrule COST-ESTIMATION::estimate-lifecycle-mission-cost
+(defrule FUZZY-COST-ESTIMATION::estimate-lifecycle-mission-cost
     ?miss <- (MANIFEST::Mission (mission-recurring-cost# ?rec&~nil) (mission-recurring-cost ?fz-rec)
          (mission-non-recurring-cost ?fz-nr) (mission-non-recurring-cost# ?nr&~nil) (lifecycle-cost# nil))
     => (modify ?miss (lifecycle-cost# (+ ?rec ?nr)) (lifecycle-cost (fuzzysum ?fz-rec ?fz-nr)))
@@ -402,7 +388,7 @@
         )
     (return (map (lambda (?x) (return (/ ?x 1000))) ?list))
     )
-;(defrule COST-ESTIMATION::estimate-programmatic-risk
+;(defrule FUZZY-COST-ESTIMATION::estimate-programmatic-risk
 ;    "This rule assesses programmatic risk from initial TRL of the instruments"
 ;    )
     
