@@ -160,7 +160,7 @@ public class JessInitializer {
             
             
             r.reset();
-            
+            r.eval("(import rbsa.eoss.*)");
             //Create precomputed queries;
             load_precompute_queries(qb);
         

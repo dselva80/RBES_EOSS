@@ -20,8 +20,8 @@ public class Result implements java.io.Serializable {
     private ArrayList subobjective_scores;
     private ArrayList objective_scores;
     private ArrayList panel_scores;
-    //private Interval fuzzy_science;
-    //private Interval fuzzy_cost;
+    private FuzzyValue fuzzy_science;
+    private FuzzyValue fuzzy_cost;
     private Architecture arch;
     private TreeMap<String,ArrayList<Fact>> explanations;
     private TreeMap<String,Double> subobjective_scores2;
@@ -53,8 +53,28 @@ public class Result implements java.io.Serializable {
         this.norm_science = (science - Params.min_science)/(Params.max_science-Params.min_science);
         this.norm_cost = (cost - Params.min_cost)/(Params.max_cost-Params.min_cost);
         taskType = "Fast";
-        //this.fuzzy_science = fuzzy_science;
-        //this.fuzzy_cost = fuzzy_cost;
+        this.fuzzy_science = null;
+        this.fuzzy_cost = null;
+    }
+    public Result(Architecture arch, double science, double cost, FuzzyValue fs, FuzzyValue fc, ArrayList subobjective_scores, ArrayList objective_scores, ArrayList panel_scores, TreeMap<String,Double> subobjective_scores2) {
+        this.science = science;
+        this.cost = cost;
+        this.subobjective_scores = subobjective_scores;
+        this.subobjective_scores2 = subobjective_scores2;
+        this.objective_scores = objective_scores;
+        this.panel_scores = panel_scores;
+        this.arch = arch;
+        explanations=null;
+        capabilities = null;
+        cost_facts = null;
+        paretoRanking = -1;
+        crowdingDistance = 0.0;
+        utility = -1.0;
+        this.norm_science = (science - Params.min_science)/(Params.max_science-Params.min_science);
+        this.norm_cost = (cost - Params.min_cost)/(Params.max_cost-Params.min_cost);
+        taskType = "Fast";
+        this.fuzzy_science = fs;
+        this.fuzzy_cost = fc;
     }
     public Result(Architecture arch, double science, double cost) {
         this.science = science;
@@ -73,8 +93,28 @@ public class Result implements java.io.Serializable {
         this.norm_science = (science - Params.min_science)/(Params.max_science-Params.min_science);
         this.norm_cost = (cost - Params.min_cost)/(Params.max_cost-Params.min_cost);
         taskType = "Fast";
-        //this.fuzzy_science = fuzzy_science;
-        //this.fuzzy_cost = fuzzy_cost;
+        this.fuzzy_science = null;
+        this.fuzzy_cost = null;
+    }
+    public Result(Architecture arch, double science, double cost, FuzzyValue fs, FuzzyValue fc) {
+        this.science = science;
+        this.cost = cost;
+        this.subobjective_scores = null;
+        this.subobjective_scores2 = null;
+        this.objective_scores = null;
+        this.panel_scores = null;
+        this.arch = arch;
+        explanations=null;
+        capabilities = null;
+        cost_facts = null;
+        paretoRanking = -1;
+        crowdingDistance = 0.0;
+        utility = -1.0;
+        this.norm_science = (science - Params.min_science)/(Params.max_science-Params.min_science);
+        this.norm_cost = (cost - Params.min_cost)/(Params.max_cost-Params.min_cost);
+        taskType = "Fast";
+        this.fuzzy_science = fs;
+        this.fuzzy_cost = fc;
     }
     public Result(Architecture arch, double science, double cost, int pr) {
         this.science = science;
@@ -93,8 +133,28 @@ public class Result implements java.io.Serializable {
         this.norm_science = (science - Params.min_science)/(Params.max_science-Params.min_science);
         this.norm_cost = (cost - Params.min_cost)/(Params.max_cost-Params.min_cost);
         taskType = "Fast";
-        //this.fuzzy_science = fuzzy_science;
-        //this.fuzzy_cost = fuzzy_cost;
+        this.fuzzy_science = null;
+        this.fuzzy_cost = null;
+    }
+    public Result(Architecture arch, double science, double cost, FuzzyValue fs, FuzzyValue fc, int pr) {
+        this.science = science;
+        this.cost = cost;
+        this.subobjective_scores = null;
+        this.subobjective_scores2 = null;
+        this.objective_scores = null;
+        this.panel_scores = null;
+        this.arch = arch;
+        explanations=null;
+        capabilities = null;
+        cost_facts = null;
+        paretoRanking = pr;
+        crowdingDistance = 0.0;
+        utility = -1.0;
+        this.norm_science = (science - Params.min_science)/(Params.max_science-Params.min_science);
+        this.norm_cost = (cost - Params.min_cost)/(Params.max_cost-Params.min_cost);
+        taskType = "Fast";
+        this.fuzzy_science = fs;
+        this.fuzzy_cost = fc;
     }
     
     //Getters and Setters
@@ -191,21 +251,16 @@ public class Result implements java.io.Serializable {
         this.cost_facts = cost_facts;
     }
     
-    /*public FuzzyValue getFuzzy_science() {
+    public FuzzyValue getFuzzy_science() {
         return fuzzy_science;
     }
 
-    public void setFuzzy_science(FuzzyValue fuzzy_science) {
-        this.fuzzy_science = fuzzy_science;
-    }
 
     public FuzzyValue getFuzzy_cost() {
         return fuzzy_cost;
     }
 
-    public void setFuzzy_cost(FuzzyValue fuzzy_cost) {
-        this.fuzzy_cost = fuzzy_cost;
-    }*/
+
     //Public methods
     public int dominates(Result r2) {
         double x1 = this.getScience() - r2.getScience();

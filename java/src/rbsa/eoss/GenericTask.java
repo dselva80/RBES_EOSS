@@ -44,6 +44,7 @@ public class GenericTask implements Callable {
     public void getResource() {
         res = ArchitectureEvaluator.getInstance().getResourcePool().getResource();
     }
+    
     public void freeResource () {
         ArchitectureEvaluator.getInstance().getResourcePool().freeResource( res );
         res = null;
@@ -89,7 +90,7 @@ public class GenericTask implements Callable {
         freeResource();
         return resu;
     }
-     private Result evaluatePerformanceFast(Rete r, Architecture arch, QueryBuilder qb, MatlabFunctions m) { 
+    private Result evaluatePerformanceFast(Rete r, Architecture arch, QueryBuilder qb, MatlabFunctions m) { 
         Result result = null;
         try {
             r.reset();
@@ -175,7 +176,8 @@ public class GenericTask implements Callable {
         
         return result;
     }
-   private Result aggregate_performance_score_facts(Rete r, MatlabFunctions m, QueryBuilder qb) {
+    
+    private Result aggregate_performance_score_facts(Rete r, MatlabFunctions m, QueryBuilder qb) {
        ArrayList subobj_scores = new ArrayList();
        ArrayList obj_scores = new ArrayList();
        ArrayList panel_scores = new ArrayList();
@@ -314,6 +316,7 @@ public class GenericTask implements Callable {
         }
         //System.out.println("Arch " + arch.toBitString() + ": Science = " + res.getScience() + "; Cost = " + res.getCost());
     }
+    
     private void designSpacecraft(Rete r, Architecture arch, QueryBuilder qb, MatlabFunctions m) {
         try {
             r.eval("(focus PRELIM-MASS-BUDGET)");
@@ -357,6 +360,7 @@ public class GenericTask implements Callable {
             System.out.println("EXC in evaluateCost: " + e.getClass() + " " + e.getMessage() + " " + e.getStackTrace());
         }
     }
+    
     private Result evaluateCapabilities(Rete r, Architecture arch, QueryBuilder qb, MatlabFunctions m) {
         Result result = new Result(arch, 0.0, 0.0);
         ArrayList<Fact> capabilities = null;
@@ -417,6 +421,7 @@ public class GenericTask implements Callable {
             System.out.println( "" + e.getClass() + " " + e.getMessage() + " " + e.getStackTrace());
         }
     }
+    
     private void assertMissionsNoSynergies(Rete r, Architecture arch, MatlabFunctions m) {
          try{
              Nto1pair pair = arch.getNto1pair();

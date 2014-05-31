@@ -46,10 +46,10 @@
         (developed-by ?whom)
         )
     =>  
-     (if (is-domestic ?whom) then (modify ?instr (cost# (apply-NICM ?name))) 
-        else (modify ?instr (cost# 0)))
+    (bind ?c0 (apply-NICM ?name)) 
+    (if (is-domestic ?whom) then (modify ?instr (cost (cost-fv ?c0 39.0)) (cost# ?c0)) 
+        else (modify ?instr (cost# 0) (cost (cost-fv 0 0))))
     )
-
 
 
 (defrule COST-ESTIMATION::estimate-payload-cost2
@@ -60,11 +60,14 @@
         )
     =>
     (bind ?costs (map get-instrument-cost ?payload)); in FY04$
+    (bind ?fuzzy-costs (map get-instrument-fuzzy-cost ?payload)); in FY04$
     ;(printout t "estimate payload cost: instrument costs = " ?costs crlf)
     (bind ?cost (sum$ ?costs)); correct for inflation from FY04 to FY00, from http://oregonstate.edu/cla/polisci/faculty-research/sahr/cv2000.pdf
-    
+    (bind ?fuzzy-cost (fuzzysum$ ?fuzzy-costs)); correct for inflation from FY04 to FY00, from http://oregonstate.edu/cla/polisci/faculty-research/sahr/cv2000.pdf
         (modify ?miss (payload-cost# ?cost) (payload-non-recurring-cost# (* 0.8 ?cost))
-        (payload-recurring-cost# (* 0.2 ?cost)))
+        (payload-recurring-cost# (* 0.2 ?cost))
+        (payload-cost ?fuzzy-cost) (payload-non-recurring-cost (fuzzyscprod ?fuzzy-cost 0.8))
+        (payload-recurring-cost (fuzzyscprod ?fuzzy-cost 0.2)))
     )
 
 ; ********************

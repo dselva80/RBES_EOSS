@@ -91,6 +91,7 @@ public class FuzzyValue implements Serializable {
 		return fv;
 	}
 	
+        @Override
 	public String toString() {
 		return ("[ " + this.interv.getMin() + " , " + this.interv.getMax() + " ]");
 	}
