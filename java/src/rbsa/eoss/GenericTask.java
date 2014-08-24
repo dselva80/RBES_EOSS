@@ -198,7 +198,8 @@ public class GenericTask implements Callable {
            ArrayList<Fact> vals = qb.makeQuery("AGGREGATION::VALUE");
            Fact val = vals.get(0);
            science = val.getSlotValue("satisfaction").floatValue(r.getGlobalContext());
-           fuzzy_science = (FuzzyValue)val.getSlotValue("fuzzy-value").javaObjectValue(r.getGlobalContext());
+           if (Params.req_mode.equalsIgnoreCase("FUZZY-ATTRIBUTES") || Params.req_mode.equalsIgnoreCase("FUZZY-CASES"))
+               fuzzy_science = (FuzzyValue)val.getSlotValue("fuzzy-value").javaObjectValue(r.getGlobalContext());
            panel_scores = m.JessList2ArrayList(val.getSlotValue("sh-scores").listValue(r.getGlobalContext()),r);
            
            ArrayList<Fact> subobj_facts = qb.makeQuery("AGGREGATION::SUBOBJECTIVE");
@@ -319,7 +320,8 @@ public class GenericTask implements Callable {
             ArrayList<Fact> missions = qb.makeQuery("MANIFEST::Mission");
             for (int i = 0;i<missions.size();i++)  {
                 cost = cost + missions.get(i).getSlotValue("lifecycle-cost#").floatValue(r.getGlobalContext());
-                fzcost = fzcost.add((FuzzyValue)missions.get(i).getSlotValue("lifecycle-cost").javaObjectValue(r.getGlobalContext()));
+                if (Params.req_mode.equalsIgnoreCase("FUZZY-ATTRIBUTES") || Params.req_mode.equalsIgnoreCase("FUZZY-CASES"))
+                    fzcost = fzcost.add((FuzzyValue)missions.get(i).getSlotValue("lifecycle-cost").javaObjectValue(r.getGlobalContext()));
             }
             
             res.setCost(cost);
@@ -613,10 +615,16 @@ public class GenericTask implements Callable {
             r.setFocus( "SYNERGIES-ACROSS-ORBITS" );
             r.run();
             //System.out.println("Syn3");
-            r.setFocus( "REQUIREMENTS" );
+            if ((Params.req_mode.equalsIgnoreCase("FUZZY-CASES")) || (Params.req_mode.equalsIgnoreCase("FUZZY-ATTRIBUTES")))
+                r.setFocus( "FUZZY-REQUIREMENTS" );
+            else
+                r.setFocus( "REQUIREMENTS" );
             r.run();
-            //System.out.println("Reqs");
-            r.setFocus( "AGGREGATION" );
+            
+            if ((Params.req_mode.equalsIgnoreCase("FUZZY-CASES")) || (Params.req_mode.equalsIgnoreCase("FUZZY-ATTRIBUTES")))
+                r.setFocus( "FUZZY-AGGREGATION" );
+            else
+                r.setFocus( "AGGREGATION" );
             r.run();
             
             if ((Params.req_mode.equalsIgnoreCase("CRISP-ATTRIBUTES")) || (Params.req_mode.equalsIgnoreCase("FUZZY-ATTRIBUTES"))) {
