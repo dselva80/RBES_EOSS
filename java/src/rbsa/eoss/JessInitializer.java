@@ -1185,7 +1185,7 @@ public class JessInitializer {
              Params.objectives_to_instruments = getInverseHashMap(Params.instruments_to_objectives);
              Params.panels_to_instruments = getInverseHashMap(Params.instruments_to_panels);
          }catch (Exception e) {
-            System.out.println( "EXC in loadRequirementRules " +e.getMessage() );
+            System.out.println( "EXC in loadCapabilityRules " +e.getMessage() );
         }
      }
      private HashMap getInverseHashMap(HashMap hm) {

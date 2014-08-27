@@ -87,6 +87,7 @@ public class Params {
     public static double prob_accept;
     // Instruments
     public static String[] instrument_list = {"SMAP_RAD","SMAP_MWR","CMIS","VIIRS","BIOMASS"};
+    //public static String[] instrument_list = {"ACE_ORCA","ACE_POL","ACE_LID","CLAR_TIR","CLAR_VNIR","ACE_CPR","DESD_SAR","DESD_LID","GACM_VIS","GACM_SWIR","HYSP_TIR","POSTEPS_IRS","CNES_KaRIN"};
     public static int ninstr;
     public static String[] orbit_list = {"LEO-600-polar-NA","SSO-600-SSO-AM","SSO-600-SSO-DD","SSO-800-SSO-DD","SSO-800-SSO-PM"};
     public static int norb;
@@ -151,15 +152,20 @@ public class Params {
         revtimes_dat_file = path + "\\dat\\revtimes.dat";
         dsm_dat_file = path + "\\dat\\all_dsms.dat";
         scores_dat_file = path  + "\\dat\\scores.dat";
-        initial_pop = path_save_results + "\\2014-05-30_16-59-31_test.rs";
+        initial_pop = "";//2014-05-31_20-20-23_test
         
         // Paths for common xls files
         template_definition_xls = path + "\\xls\\AttributeSet.xls";//used
         mission_analysis_database_xls = path + "\\xls\\Mission Analysis Database.xls";//used
         capability_rules_xls = path + "\\xls\\SMAP Instrument Capability Definition.xls";//used
-        requirement_satisfaction_xls = path + "\\xls\\SMAP Requirement Rules HighTempRes.xls";//used
+        requirement_satisfaction_xls = path + "\\xls\\SMAP Requirement Rules.xls";//used
         aggregation_xls = path + "\\xls\\SMAP Aggregation Rules.xls";//used        
         
+        /*template_definition_xls = path + "\\xls\\Climate-centric\\Climate-centric AttributeSet.xls";//used
+        mission_analysis_database_xls = path + "\\xls\\Climate-centric\\Mission Analysis Database.xls";//used
+        capability_rules_xls = path + "\\xls\\Climate-centric\\Climate-centric Instrument Capability Definition.xls";//used
+        requirement_satisfaction_xls = path + "\\xls\\Climate-centric\\Climate-centric Requirement Rules.xls";//used
+        aggregation_xls = path + "\\xls\\Climate-centric\\Climate-centric Aggregation Rules.xls";//used  */
         
         // Paths for common clp files
         module_definition_clp        = path + "\\clp\\modules.clp";//used
