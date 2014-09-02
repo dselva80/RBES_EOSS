@@ -41,7 +41,7 @@ public class RBSAEOSSSMAP {
         //String path  = "C:\\Users\\DS925\\Documents\\GitHub\\RBES_EOSS";//RBES SMAP for IEEEAero14 code
         String path  = "C:\\Users\\Ana-Dani\\Documents\\GitHub\\RBES_EOSS";
         
-        int MODE = 1;
+        int MODE = 3;
         ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
         ArchTradespaceExplorer ATE = ArchTradespaceExplorer.getInstance();
         ResultManager RM = ResultManager.getInstance();
@@ -49,10 +49,10 @@ public class RBSAEOSSSMAP {
         String search_clps = "";
         switch(MODE) {
             case 1: //1 arch
-                params = new Params( path, "CRISP-ATTRIBUTES", "test","normal",search_clps);//FUZZY or CRISP
+                params = new Params( path, "FUZZY-ATTRIBUTES", "test","normal",search_clps);//FUZZY or CRISP
                 AE.init(1);
-                Architecture arch = ArchitectureGenerator.getInstance().getTestArch();
-                Result result1 = AE.evaluateArchitecture(arch,"Slow");
+                Architecture arch = ArchitectureGenerator.getInstance().getMaxArch();
+                Result result1 = AE.evaluateArchitecture(arch,"Fast");
                 System.out.println("NOSYN. Arch " + arch.toBitString() + "=> science = " + result1.getScience() + " cost = " + result1.getCost());
                 RM.saveResultCollection(new ResultCollection(AE.getResults()));
                 //Result result2 = AE.evaluateArchitecture(arch,"Slow");
@@ -75,11 +75,11 @@ public class RBSAEOSSSMAP {
                 int MAX_SEARCH_ITS = 5;
                 
                 for (int i = 0;i<20;i++) {
-                    params = new Params( path, "FUZZY-ATTRIBUTES", "test","normal","search_heuristic_rules_smap_2");//FUZZY or CRISP
+                    params = new Params( path, "CRISP-ATTRIBUTES", "test","normal","search_heuristic_rules_smap_2");//FUZZY or CRISP
                     ArrayList<Architecture> init_pop = ArchitectureGenerator.getInstance().getInitialPopulation(POP_SIZE);
                     //ArrayList<Architecture> init_pop = RM.loadResultCollectionFromFile(Params.initial_pop).getPopulation();
                     AE.clear();
-                    AE.init(7);
+                    AE.init(8);
                     AE.evalMinMax();
                     ATE.clear();
                     ATE.setTerm_crit(new SearchOptions(POP_SIZE,MAX_SEARCH_ITS,0.5,0.1,0.5,init_pop));
@@ -150,7 +150,7 @@ public class RBSAEOSSSMAP {
                 break;
             case 6://Update capabilities file
                 params = new Params( path, "CRISP-ATTRIBUTES", "test","update_capabilities",search_clps);//FUZZY or CRISP
-                AE.init(3);
+                AE.init(8);
                 AE.precomputeCapabilities();                
                 try{
                     SimpleDateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd-HH-mm-ss" );

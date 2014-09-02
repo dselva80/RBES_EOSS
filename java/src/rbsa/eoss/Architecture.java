@@ -331,6 +331,9 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
     public Result getResult() {
         return result;
     }
+    public int getTotalInstruments() {
+        return SumAllInstruments(mat);
+    }
     
     //Setters
     public void setParetoRanking(int paretoRanking) {
@@ -494,6 +497,18 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         for (int i = 0;i<ncols;i++) {
             if (mat[row][i]) {
                 x = x + 1;
+            }
+        }
+        return x;
+    }
+    private int SumAllInstruments(boolean[][] mat) {
+        int x = 0;
+        int ncols = mat[0].length;
+        for (int row = 0;row<mat.length;row++) {
+            for (int i = 0;i<ncols;i++) {
+                if (mat[row][i]) {
+                    x = x + 1;
+                }
             }
         }
         return x;
@@ -1115,6 +1130,8 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         return thenew;
     }
     
-    
+    public boolean isFeasibleAssignment() {
+        return (SumAllInstruments(mat) <= Params.MAX_TOTAL_INSTR);
+    }
 
 }

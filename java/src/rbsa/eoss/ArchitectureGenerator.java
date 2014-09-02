@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import rbsa.eoss.local.Params;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -192,8 +193,9 @@ public class ArchitectureGenerator {
         return new Architecture(mat,Params.nsats[rnd.nextInt(Params.nsats.length)]);
     }
     public Architecture getTestArch() { // SMAP 2 SSO orbits, 2 sats per orbit
-        Architecture arch = new Architecture("0011000000111110000000000",1);
+        //Architecture arch = new Architecture("0011000000111110000000000",1);
         //Architecture arch = new Architecture("01000010000100001000010000100001000010000100001000010000100001000",1);
+        Architecture arch = new Architecture("110001100011000110001100011000110001100011000110001100011000",1);
         arch.setEval_mode("DEBUG");
         return arch;//{"SMAP_RAD","SMAP_MWR","CMIS","VIIRS","BIOMASS"};{"600polar","600AM","600DD","800AM","800PM"};
     }
@@ -206,7 +208,12 @@ public class ArchitectureGenerator {
             }
 
         }
-        return new Architecture(mat,2);
+        return new Architecture(mat,1);
+    }
+    public Architecture getMaxArch2() { // SMAP 2 SSO orbits, 2 sats per orbit
+        Architecture arch = new Architecture("110001100011000110001100011000110001100011000110001100011000",1);
+        arch.setEval_mode("DEBUG");
+        return arch;//{"SMAP_RAD","SMAP_MWR","CMIS","VIIRS","BIOMASS"};{"600polar","600AM","600DD","800AM","800PM"};
     }
     public Architecture getMinArch() {
         boolean[][] mat = new boolean[Params.norb][Params.ninstr];

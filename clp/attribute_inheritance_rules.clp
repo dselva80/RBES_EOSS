@@ -352,7 +352,7 @@
     ?instr <- (CAPABILITIES::Manifested-instrument (Intent "Cloud profile and rain radars") 
         (off-axis-angle-plus-minus# ?theta&~nil) (scanning conical) (orbit-altitude# ?h&~nil) (Swath# nil))
     =>
-    (bind ?sw (* 2 ?h (matlabf tan (* ?theta (/ (pi) 180)) ))); hsr = lambda/D*h, lambda=c/f
+    (bind ?sw (* 2 ?h (tan ?theta ))); hsr = lambda/D*h, lambda=c/f
     (modify ?instr (Swath# ?sw))
     )
 

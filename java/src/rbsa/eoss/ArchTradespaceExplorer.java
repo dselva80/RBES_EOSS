@@ -377,6 +377,20 @@ public class ArchTradespaceExplorer {
         return rankings;
     }
     public int dominates(Result r1,Result r2) {
+        // Feasibility before fitness
+        if (r1.getArch().isFeasibleAssignment() && !r2.getArch().isFeasibleAssignment())
+            return 1;
+        if (!r1.getArch().isFeasibleAssignment() && r2.getArch().isFeasibleAssignment())
+            return -1;
+        if (!r1.getArch().isFeasibleAssignment() && !r2.getArch().isFeasibleAssignment())
+            if(r1.getArch().getTotalInstruments() < r2.getArch().getTotalInstruments())
+                return 1;
+            else if(r1.getArch().getTotalInstruments() > r2.getArch().getTotalInstruments()) 
+                return -1;
+            else //Both are infeasible, and both to teh same degree (i.e., both have the same number of total instruments)
+                return 0;
+        
+        //Both feasible ==> Sorting by fitness
         double x1 = r1.getScience() - r2.getScience();
         double x2 = r1.getCost() - r2.getCost();
         if((x1>=0 && x2<=0) && !(x1==0 && x2==0)) 

@@ -1,17 +1,17 @@
-function EON_precompute_revtimes_withnumsats(folder)
+function EON_precompute_revtimes_withnumsats(params, AE)
 %% EOCubesats_precompute_revtimes.m
 %
 % This function computes the scores of all subsets of instrument in all
 % possible orbits
 % 
 % revtimes.get([FOV, orbits]) = [revtime]
-import rbsa.eoss.*
-import rbsa.eoss.local.*
-
-params = Params(folder,'CRISP-ATTRIBUTES','test','normal','');
+% import rbsa.eoss.*
+% import rbsa.eoss.local.*
+% 
+% params = Params(folder,'CRISP-ATTRIBUTES','test','normal','');
 % params = Params('C:\Users\Nozomi\Dropbox\Nozomi - Dani\RBES SMAP for IEEEAero14','CRISP-ATTRIBUTES','test','normal','');
-AE = ArchitectureEvaluator.getInstance;
-AE.init(1);
+% AE = ArchitectureEvaluator.getInstance;
+% AE.init(1);
 revtimes = java.util.HashMap;
 orbs = params.orbit_list;norb = length(orbs);
 % instr = params.instrument_list;

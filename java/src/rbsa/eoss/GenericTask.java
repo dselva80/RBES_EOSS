@@ -51,7 +51,14 @@ public class GenericTask implements Callable {
     }
     @Override
     public Result call()
-    {
+    {   System.out.println("Evaluating Arch " + arch.toBitString() + " nsats = " + arch.getNsats() + " ... " );
+        
+        if (!arch.isFeasibleAssignment()) {
+            int diff = arch.getTotalInstruments() - Params.MAX_TOTAL_INSTR;
+            System.out.println("Arch " + arch.toBitString() + " nsats = " + arch.getNsats() + " is infeasible by " + diff);
+            return new Result(arch, 0.0, 1E5, null, null, null, null, null,null);
+        }
+    
         getResource();
         Rete r = res.getRete();
         QueryBuilder qb = res.getQueryBuilder();
@@ -92,6 +99,7 @@ public class GenericTask implements Callable {
     }
     private Result evaluatePerformanceFast(Rete r, Architecture arch, QueryBuilder qb, MatlabFunctions m) { 
         Result result = null;
+        
         try {
             r.reset();
             r.eval("(bind ?*science-multiplier* 1.0)");

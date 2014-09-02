@@ -86,15 +86,15 @@ public class Params {
     public static int num_improve_heuristics;
     public static double prob_accept;
     // Instruments
-    public static String[] instrument_list = {"SMAP_RAD","SMAP_MWR","CMIS","VIIRS","BIOMASS"};
-    //public static String[] instrument_list = {"ACE_ORCA","ACE_POL","ACE_LID","CLAR_TIR","CLAR_VNIR","ACE_CPR","DESD_SAR","DESD_LID","GACM_VIS","GACM_SWIR","HYSP_TIR","POSTEPS_IRS","CNES_KaRIN"};
+    //public static String[] instrument_list = {"SMAP_RAD","SMAP_MWR","CMIS","VIIRS","BIOMASS"};
+    public static String[] instrument_list = {"ACE_ORCA","ACE_POL","ACE_LID","CLAR_ERB","ACE_CPR","DESD_SAR","DESD_LID","GACM_VIS","GACM_SWIR","HYSP_TIR","POSTEPS_IRS","CNES_KaRIN"};
     public static int ninstr;
     public static String[] orbit_list = {"LEO-600-polar-NA","SSO-600-SSO-AM","SSO-600-SSO-DD","SSO-800-SSO-DD","SSO-800-SSO-PM"};
     public static int norb;
     public static HashMap instrument_indexes;
     public static HashMap orbit_indexes;
-    public static int[] nsats = {1,2};
-    
+    public static int[] nsats = {1};
+    public static int MAX_TOTAL_INSTR;
     // Results
     public static String path_save_results;
     
@@ -148,24 +148,24 @@ public class Params {
         this.name = name;
         this.run_mode = run_mode;
         path_save_results = path + "\\results";
-        capability_dat_file = path + "\\dat\\capabilities.dat";
-        revtimes_dat_file = path + "\\dat\\revtimes.dat";
+        capability_dat_file = path + "\\dat\\capabilities2014-08-29-14-44-57.dat";
+        revtimes_dat_file = path + "\\dat\\climate-centric revtimes.dat";
         dsm_dat_file = path + "\\dat\\all_dsms.dat";
         scores_dat_file = path  + "\\dat\\scores.dat";
         initial_pop = "";//2014-05-31_20-20-23_test
         
         // Paths for common xls files
-        template_definition_xls = path + "\\xls\\AttributeSet.xls";//used
+        /*template_definition_xls = path + "\\xls\\AttributeSet.xls";//used
         mission_analysis_database_xls = path + "\\xls\\Mission Analysis Database.xls";//used
         capability_rules_xls = path + "\\xls\\SMAP Instrument Capability Definition.xls";//used
         requirement_satisfaction_xls = path + "\\xls\\SMAP Requirement Rules.xls";//used
-        aggregation_xls = path + "\\xls\\SMAP Aggregation Rules.xls";//used        
+        aggregation_xls = path + "\\xls\\SMAP Aggregation Rules.xls";//used*/        
         
-        /*template_definition_xls = path + "\\xls\\Climate-centric\\Climate-centric AttributeSet.xls";//used
+        template_definition_xls = path + "\\xls\\Climate-centric\\Climate-centric AttributeSet.xls";//used
         mission_analysis_database_xls = path + "\\xls\\Climate-centric\\Mission Analysis Database.xls";//used
-        capability_rules_xls = path + "\\xls\\Climate-centric\\Climate-centric Instrument Capability Definition.xls";//used
+        capability_rules_xls = path + "\\xls\\Climate-centric\\Climate-centric Instrument Capability Definition2.xls";//used
         requirement_satisfaction_xls = path + "\\xls\\Climate-centric\\Climate-centric Requirement Rules.xls";//used
-        aggregation_xls = path + "\\xls\\Climate-centric\\Climate-centric Aggregation Rules.xls";//used  */
+        aggregation_xls = path + "\\xls\\Climate-centric\\Climate-centric Aggregation Rules.xls";//used  
         
         // Paths for common clp files
         module_definition_clp        = path + "\\clp\\modules.clp";//used
@@ -229,6 +229,7 @@ public class Params {
 
         //instrument_list[0] = "SMAP_ANT";
         ninstr = instrument_list.length;
+        MAX_TOTAL_INSTR = 2*ninstr;
         norb = orbit_list.length;
         instrument_indexes = new HashMap<String,Integer>();
         orbit_indexes= new HashMap<String,Integer>();
@@ -266,7 +267,7 @@ public class Params {
                 ois.close();
             }
             if(!run_mode.equalsIgnoreCase("update_capabilities")) {
-
+                
                 FileInputStream fis2 = new FileInputStream(capability_dat_file);
                 ObjectInputStream ois2 = new ObjectInputStream(fis2);
                 capabilities = (HashMap) ois2.readObject();

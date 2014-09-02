@@ -419,7 +419,7 @@ public class ArchitectureEvaluator {
     }
     public void evalMinMax() {
        
-        Architecture max_arch = ArchitectureGenerator.getInstance().getMaxArch();
+        Architecture max_arch = ArchitectureGenerator.getInstance().getMaxArch2();
         Result r2 = evaluateArchitecture(max_arch,"Fast");
         Params.max_science = r2.getScience();
         Params.max_cost = r2.getCost();

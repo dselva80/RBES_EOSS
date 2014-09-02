@@ -268,6 +268,17 @@ public class Result implements java.io.Serializable {
 
     //Public methods
     public int dominates(Result r2) {
+        if (this.getArch().isFeasibleAssignment() && !r2.getArch().isFeasibleAssignment())
+            return 1;
+        if (!this.getArch().isFeasibleAssignment() && r2.getArch().isFeasibleAssignment())
+            return -1;
+        if (!this.getArch().isFeasibleAssignment() && !r2.getArch().isFeasibleAssignment())
+            if(this.getArch().getTotalInstruments() < r2.getArch().getTotalInstruments())
+                return 1;
+            else if(this.getArch().getTotalInstruments() > r2.getArch().getTotalInstruments()) 
+                return -1;
+            else //Both are infeasible, and both to teh same degree (i.e., both have the same number of total instruments)
+                return 0;
         double x1 = this.getScience() - r2.getScience();
         double x2 = this.getCost() - r2.getCost();
         if((x1>=0 && x2<=0) && !(x1==0 && x2==0)) 
@@ -318,7 +329,17 @@ public class Result implements java.io.Serializable {
     }
     @Override
     public String toString() {
-        return "Result{" + "science=" + science + ", cost=" + cost + " fuz_sc=" + fuzzy_science.toString() + " fuz_co=" + fuzzy_cost.toString() + ", arch=" + arch.toString() + ", paretoRanking=" + paretoRanking + '}';
+        String fs;
+        if (fuzzy_science == null)
+            fs = "null";
+        else
+            fs = fuzzy_science.toString();
+        String fc;
+        if (fuzzy_cost == null)
+            fc = "null";
+        else
+            fc = fuzzy_cost.toString();
+        return "Result{" + "science=" + science + ", cost=" + cost + " fuz_sc=" + fs + " fuz_co=" + fc + ", arch=" + arch.toString() + ", paretoRanking=" + paretoRanking + '}';
     }
    
 }
