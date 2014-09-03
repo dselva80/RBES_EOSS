@@ -82,21 +82,24 @@
 (defrule CAPABILITIES::resource-limitations-datarate
     (declare (salience 10))
     ?l1 <- (CAPABILITIES::can-measure (instrument ?ins1) (can-take-measurements yes) (data-rate-duty-cycle# nil))
-    (CAPABILITIES::Manifested-instrument (Name ?ins1&~nil) (flies-in ?miss&~nil))
+    ?i1 <- (CAPABILITIES::Manifested-instrument (Name ?ins1&~nil) (flies-in ?miss&~nil))
     (MANIFEST::Mission  (Name ?miss) (sat-data-rate-per-orbit# ?rbo&~nil))
     =>
     (bind ?dc (min 1.0 (/ (* 7 60 500 (/ 1 8192)) ?rbo))); you get 1 7' pass at 500Mbps max
     (modify ?l1 (data-rate-duty-cycle# ?dc) (reason "Cumulative spacecraft data rate cannot be downloaded to ground stations"))
+	(modify ?i1 (data-rate-duty-cycle# ?dc) )
     (if (< ?dc 1.0) then (printout t "resource-limitations-datarate " ?ins1 " dc = " ?dc crlf))
     )
 
 (defrule CAPABILITIES::resource-limitations-power
     (declare (salience 10))
     ?l1 <- (CAPABILITIES::can-measure (instrument ?ins1) (can-take-measurements yes) (power-duty-cycle# nil))
+	?i1 <- (CAPABILITIES::Manifested-instrument (Name ?ins1&~nil) (flies-in ?miss&~nil))
     (MANIFEST::Mission  (satellite-BOL-power# ?pow&~nil))
     =>
     (bind ?dc (min 1.0 (/ 10000 ?pow)))
     (modify ?l1 (power-duty-cycle# ?dc) (reason "Cumulative spacecraft power exceeds 10kW"))
+	(modify ?i1 (power-duty-cycle# ?dc) )
     (if (< ?dc 1.0) then (printout t "resource-limitations-power " ?ins1 " dc = " ?dc crlf))
     )
         

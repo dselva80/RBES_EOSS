@@ -131,7 +131,7 @@ public class JessInitializer {
                 loadFuzzyRequirementRulesAttribs(r, requirements_xls, "Attributes", m);
             }
             //Load capability rules
-            loadCapabilityRules(r,instrument_xls);
+            loadCapabilityRules(r,instrument_xls,Params.capability_rules_clp);
             
             //Load synergy rules
             loadSynergyRules(r,Params.synergy_rules_clp);
@@ -794,7 +794,7 @@ public class JessInitializer {
                         rhs = "";
                         rhs2 = " (bind ?list (create$ ";
                         attribs = "";
-                        lhs = "(defrule REQUIREMENTS::"  + subobj + "-attrib ?m <- (REQUIREMENTS::Measurement (taken-by ?whom) (Parameter " + param + ")";
+                        lhs = "(defrule REQUIREMENTS::"  + subobj + "-attrib ?m <- (REQUIREMENTS::Measurement (taken-by ?whom) (power-duty-cycle# ?pc) (data-rate-duty-cycle# ?dc)  (Parameter " + param + ")";
                         current_subobj = subobj;
                         current_param = param;
                         nattrib = 0;
@@ -804,7 +804,7 @@ public class JessInitializer {
                         rhs = "";
                         rhs2 = " (bind ?list (create$ ";
                         attribs = "";
-                        lhs = "(defrule REQUIREMENTS::"  + subobj + "-attrib ?m <- (REQUIREMENTS::Measurement (taken-by ?whom) (Parameter " + param + ")";
+                        lhs = "(defrule REQUIREMENTS::"  + subobj + "-attrib ?m <- (REQUIREMENTS::Measurement (taken-by ?whom)  (power-duty-cycle# ?pc) (data-rate-duty-cycle# ?dc)  (Parameter " + param + ")";
                         current_subobj = subobj;
                         current_param = param;
                         subobj_tests = new HashMap();
@@ -880,8 +880,8 @@ public class JessInitializer {
                         String parent = tokens[0];
                         String index = tokens[1];
                         call2 = call2 + " (AGGREGATION::SUBOBJECTIVE (satisfaction 0.0) (fuzzy-value (new FuzzyValue \"Value\" 0.0 0.0 0.0 \"utils\" (MatlabFunctions getValue_inv_hashmap))) (id " + current_subobj + ") (index " + index + ") (parent " + parent + ") (reasons (create$ " + StringUtils.repeat("N-A ",nattrib) + " ))) ";
-                        String rhs0 = ") => (bind ?reason \"\") (bind ?new-reasons (create$ "  + StringUtils.repeat("N-A ",nattrib) + "))";
-                        req_rule = lhs + rhs0 + rhs + rhs2 + ")) (assert (AGGREGATION::SUBOBJECTIVE (id " + current_subobj + ") (attributes " + attribs + ") (index " + index + ") (parent " + parent + " ) "
+                        String rhs0 = ") => (bind ?reason \"\") (bind ?new-reasons (create$ "  + StringUtils.repeat("N-A ",nattrib + 2) + "))";
+                        req_rule = lhs + rhs0 + rhs + rhs2 + " ?dc ?pc)) (assert (AGGREGATION::SUBOBJECTIVE (id " + current_subobj + ") (attributes " + attribs + " data-rate-duty-cycle power-duty-cycle) (index " + index + ") (parent " + parent + " ) "
                                 + "(attrib-scores ?list) (satisfaction (*$ ?list)) (fuzzy-value (new FuzzyValue \"Value\" (call "
                                 + "(new FuzzyValue \"Value\" (new Interval \"interval\" (*$ ?list) (*$ ?list)) \"utils\" "
                                 + "(MatlabFunctions getValue_hashmap)) getFuzzy_val) \"utils\" (MatlabFunctions getValue_inv_hashmap))) "
@@ -895,7 +895,7 @@ public class JessInitializer {
                         rhs = "";
                         rhs2 = " (bind ?list (create$ ";
                         attribs = "";
-                        lhs = "(defrule FUZZY-REQUIREMENTS::"  + subobj + "-attrib ?m <- (REQUIREMENTS::Measurement (taken-by ?whom) (Parameter " + param + ")";
+                        lhs = "(defrule FUZZY-REQUIREMENTS::"  + subobj + "-attrib ?m <- (REQUIREMENTS::Measurement (taken-by ?whom) (data-rate-duty-cycle# ?dc) (power-duty-cycle# ?pc) (Parameter " + param + ")";
                         current_subobj = subobj;
                         current_param = param;
                         nattrib = 0;
@@ -905,7 +905,7 @@ public class JessInitializer {
                         rhs = "";
                         rhs2 = " (bind ?list (create$ ";
                         attribs = "";
-                        lhs = "(defrule FUZZY-REQUIREMENTS::"  + subobj + "-attrib ?m <- (REQUIREMENTS::Measurement (taken-by ?whom) (Parameter " + param + ")";
+                        lhs = "(defrule FUZZY-REQUIREMENTS::"  + subobj + "-attrib ?m <- (REQUIREMENTS::Measurement (taken-by ?whom) (data-rate-duty-cycle# ?dc) (power-duty-cycle# ?pc) (Parameter " + param + ")";
                         current_subobj = subobj;
                         current_param = param;
                         subobj_tests = new HashMap();
@@ -938,9 +938,9 @@ public class JessInitializer {
             call2 = call2 + " (AGGREGATION::SUBOBJECTIVE (satisfaction 0.0) (fuzzy-value "
                     + "(new FuzzyValue \"Value\" 0.0 0.0 0.0 \"utils\" (MatlabFunctions getValue_inv_hashmap)))"
                     + " (id " + current_subobj + ") (index " + index + ") (parent " + parent + ") "
-                    + "(reasons (create$ " + StringUtils.repeat("N-A ",nattrib) + " ))) ";
+                    + "(reasons (create$ " + StringUtils.repeat("N-A ",nattrib + 2) + " ))) ";
             String rhs0 = ") => (bind ?reason \"\") (bind ?new-reasons (create$ "  + StringUtils.repeat("N-A ",nattrib) + "))";
-            req_rule = lhs + rhs0 + rhs + rhs2 + ")) (assert (AGGREGATION::SUBOBJECTIVE (id " + current_subobj + ") (attributes " + attribs + ") (index " + index + ") (parent " + parent + " ) "
+            req_rule = lhs + rhs0 + rhs + rhs2 + " ?dc ?pc)) (assert (AGGREGATION::SUBOBJECTIVE (id " + current_subobj + ") (attributes " + attribs + " data-rate-duty-cycle power-duty-cycle) (index " + index + ") (parent " + parent + " ) "
                                 + "(attrib-scores ?list) (satisfaction (*$ ?list)) (fuzzy-value (new FuzzyValue \"Value\" (call "
                                 + "(new FuzzyValue \"Value\" (new Interval \"interval\" (*$ ?list) (*$ ?list)) \"utils\" "
                                 + "(MatlabFunctions getValue_hashmap)) getFuzzy_val) \"utils\" (MatlabFunctions getValue_inv_hashmap))) "
@@ -1107,8 +1107,9 @@ public class JessInitializer {
             System.out.println( "EXC in loadRequirementRules " +e.getMessage() );
         }
      }
-     private void loadCapabilityRules(Rete r, Workbook xls) {
+     private void loadCapabilityRules(Rete r, Workbook xls, String clp) {
          try {
+             r.batch(clp);
              for (String instrument:Params.instrument_list) {
                  Sheet sh = xls.getSheet(instrument);
                  int nmeasurements = sh.getRows();
@@ -1126,7 +1127,8 @@ public class JessInitializer {
                 String call2 = "(defrule CAPABILITIES::" + instrument + "-measurements " + "?this <- (CAPABILITIES::Manifested-instrument  (Name ?ins&" + instrument
                          +  ") (Id ?id) (flies-in ?miss) (Intent ?int) (Spectral-region ?sr) (orbit-type ?typ) (orbit-altitude# ?h) (orbit-inclination ?inc) (orbit-RAAN ?raan) (orbit-anomaly# ?ano) (Illumination ?il)) " 
                          + " (CAPABILITIES::can-measure (instrument ?ins) (can-take-measurements yes) (data-rate-duty-cycle# ?dc-d) (power-duty-cycle# ?dc-p)) => " 
-                         + " (if (and (numberp ?dc-d) (numberp ?dc-d)) then (bind ?*science-multiplier* (min ?dc-d ?dc-p)) else (bind ?*science-multiplier* 1.0)) (assert (CAPABILITIES::resource-limitations (data-rate-duty-cycle# ?dc-d) (power-duty-cycle# ?dc-p))) ";
+                         + " (if (and (numberp ?dc-d) (numberp ?dc-p)) then (bind ?*science-multiplier* (min ?dc-d ?dc-p)) else (bind ?*science-multiplier* 1.0)) " 
+                        + "(assert (CAPABILITIES::resource-limitations (data-rate-duty-cycle# ?dc-d) (power-duty-cycle# ?dc-p))) ";//+ " (if (and (numberp ?dc-d) (numberp ?dc-d)) then (bind ?*science-multiplier* (min ?dc-d ?dc-p)) else (bind ?*science-multiplier* 1.0)) " 
                 String list_of_measurements = "";
                 for (int i = 0;i<nmeasurements;i++) {
                     Cell[] row = sh.getRow(i);

@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Random;
+import static rbsa.eoss.local.Params.path;
 
 public class ArchitectureGenerator {
 
@@ -84,17 +85,27 @@ public class ArchitectureGenerator {
         return b;
     }
     public ArrayList<Architecture> getInitialPopulation (int NUM_ARCHS) {
-        if (Params.initial_pop.isEmpty())
-            return generateRandomPopulation(NUM_ARCHS);
-        else
-            return ResultManager.getInstance().loadResultCollectionFromFile(Params.initial_pop).getPopulation();
+        population = new ArrayList<Architecture>();
+        
+        if (Params.initial_pop.isEmpty()) {
+            population.addAll(getManualArchitectures());
+            population.addAll(generateRandomPopulation(NUM_ARCHS - population.size()));
+        }
+        else {
+            population.addAll(getManualArchitectures());
+            ArrayList<Architecture> init = ResultManager.getInstance().loadResultCollectionFromFile(Params.initial_pop).getPopulation();
+            int n = Math.min(NUM_ARCHS - population.size(), init.size());
+            population.addAll(init.subList(0, n));
+            population.addAll(generateRandomPopulation(NUM_ARCHS - population.size()));
+        }
+        
+        return population;
     }
     
     public ArrayList<Architecture> generateRandomPopulation(int NUM_ARCHS) {
         //int NUM_ARCHS = 100;
         int GENOME_LENGTH = Params.ninstr * Params.norb;
-        population = new ArrayList(NUM_ARCHS);
-        Random rnd = new Random();
+        ArrayList<Architecture> popu = new ArrayList(NUM_ARCHS);
         try {
             for (int i = 0; i < NUM_ARCHS; i++) {
                 boolean[] x = new boolean[GENOME_LENGTH];
@@ -109,9 +120,9 @@ public class ArchitectureGenerator {
             System.out.println(e.getMessage());
         }
 
-        return (ArrayList<Architecture>) population;
+        return popu;
     }
-
+    
     public ArrayList<Architecture> localSearch(ArrayList<Architecture> pop0) {
         //Remove duplicates
         
@@ -181,6 +192,35 @@ public class ArchitectureGenerator {
         return population;
     }
 
+    public ArrayList<Architecture> getManualArchitectures() {
+        ArrayList<Architecture> man_archs = new ArrayList<Architecture>();
+        man_archs.add(new Architecture("000000000000000000000000000000000000000000000000000000000000",1));
+        //N = 1 in random orbit (12) 
+        for (int i = 0;i<Params.ninstr;i++) {
+            StringBuilder str = new StringBuilder("000000000000000000000000000000000000000000000000000000000000");
+            int orb = rnd.nextInt(Params.norb);
+            str.setCharAt(Params.ninstr*orb + i, '1');
+            man_archs.add(new Architecture(str.toString(),1));
+        }
+        //N = 2 in random orbit (66)
+        for (int i = 0;i<Params.ninstr - 1;i++) {
+            for (int j = i+1;j<Params.ninstr;j++) {
+                StringBuilder str = new StringBuilder("000000000000000000000000000000000000000000000000000000000000");
+                int orb = rnd.nextInt(Params.norb);
+                str.setCharAt(Params.ninstr*orb + i, '1');
+                str.setCharAt(Params.ninstr*orb + j, '1');
+                man_archs.add(new Architecture(str.toString(),1));
+            }
+        }
+        
+        //One copy of each instrument in the same orbit
+        man_archs.add(new Architecture("000000000000111111111111000000000000000000000000000000000000",1));
+        
+        //Two copies of each instrument in the same orbits
+        man_archs.add(new Architecture("111111111111111111111111000000000000000000000000000000000000",1));
+        return man_archs;
+    }
+    
     //Single architecture constructors
     public Architecture getRandomArch() {
         boolean[][] mat = new boolean[Params.norb][Params.ninstr];
@@ -195,11 +235,16 @@ public class ArchitectureGenerator {
     public Architecture getTestArch() { // SMAP 2 SSO orbits, 2 sats per orbit
         //Architecture arch = new Architecture("0011000000111110000000000",1);
         //Architecture arch = new Architecture("01000010000100001000010000100001000010000100001000010000100001000",1);
-        Architecture arch = new Architecture("110001100011000110001100011000110001100011000110001100011000",1);
+        Architecture arch = new Architecture("100001000011001010111100001001001010101010110001100000110100",1);
         arch.setEval_mode("DEBUG");
         return arch;//{"SMAP_RAD","SMAP_MWR","CMIS","VIIRS","BIOMASS"};{"600polar","600AM","600DD","800AM","800PM"};
     }
-
+    public Architecture getTestArch2() {
+        String[] payl = {"DESD_LID","DESD_SAR"};
+        Architecture arch = new Architecture(payl,"SSO-600-SSO-DD");
+        arch.setEval_mode("DEBUG");
+        return arch;
+    }
     public Architecture getMaxArch() {
         boolean[][] mat = new boolean[Params.norb][Params.ninstr];
         for (int i = 0; i < Params.norb; i++) {
@@ -211,7 +256,7 @@ public class ArchitectureGenerator {
         return new Architecture(mat,1);
     }
     public Architecture getMaxArch2() { // SMAP 2 SSO orbits, 2 sats per orbit
-        Architecture arch = new Architecture("110001100011000110001100011000110001100011000110001100011000",1);
+        Architecture arch = new Architecture("111111111111111111111111000000000000000000000000000000000000",1);
         arch.setEval_mode("DEBUG");
         return arch;//{"SMAP_RAD","SMAP_MWR","CMIS","VIIRS","BIOMASS"};{"600polar","600AM","600DD","800AM","800PM"};
     }

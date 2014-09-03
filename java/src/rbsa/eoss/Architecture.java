@@ -165,6 +165,7 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         crossover = "no";
         improve = "no";
         id = UUID.randomUUID().toString();
+        nsats = 1;
     }
     public Architecture(Nto1pair nto1pair, String orbit) {
         this.nto1pair = nto1pair;

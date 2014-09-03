@@ -41,7 +41,7 @@ public class RBSAEOSSSMAP {
         //String path  = "C:\\Users\\DS925\\Documents\\GitHub\\RBES_EOSS";//RBES SMAP for IEEEAero14 code
         String path  = "C:\\Users\\Ana-Dani\\Documents\\GitHub\\RBES_EOSS";
         
-        int MODE = 3;
+        int MODE = 1;
         ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
         ArchTradespaceExplorer ATE = ArchTradespaceExplorer.getInstance();
         ResultManager RM = ResultManager.getInstance();
@@ -51,12 +51,14 @@ public class RBSAEOSSSMAP {
             case 1: //1 arch
                 params = new Params( path, "FUZZY-ATTRIBUTES", "test","normal",search_clps);//FUZZY or CRISP
                 AE.init(1);
-                Architecture arch = ArchitectureGenerator.getInstance().getMaxArch();
+                //Architecture arch = ArchitectureGenerator.getInstance().getMaxArch();
+                Architecture arch = ArchitectureGenerator.getInstance().getTestArch();
                 Result result1 = AE.evaluateArchitecture(arch,"Fast");
-                System.out.println("NOSYN. Arch " + arch.toBitString() + "=> science = " + result1.getScience() + " cost = " + result1.getCost());
-                RM.saveResultCollection(new ResultCollection(AE.getResults()));
-                //Result result2 = AE.evaluateArchitecture(arch,"Slow");
+                //System.out.println("NOSYN. Arch " + arch.toBitString() + "=> science = " + result1.getScience() + " cost = " + result1.getCost());
+                Architecture arch2 = ArchitectureGenerator.getInstance().getTestArch2();
+                Result result2 = AE.evaluateArchitecture(arch2,"Slow");
                 //System.out.println("SYN. Arch " + arch.toBitString() + "=> science = " + result2.getScience() + " cost = " + result2.getCost());
+                RM.saveResultCollection(new ResultCollection(AE.getResults()));
                 System.out.println("DONE");
                 break;
             case 2://Full factorial 7 CPUS with random population
@@ -71,11 +73,11 @@ public class RBSAEOSSSMAP {
                 System.out.println("DONE");
                 break;
             case 3://Search
-                int POP_SIZE = 100;
+                int POP_SIZE = 200;
                 int MAX_SEARCH_ITS = 5;
                 
                 for (int i = 0;i<20;i++) {
-                    params = new Params( path, "CRISP-ATTRIBUTES", "test","normal","search_heuristic_rules_smap_2");//FUZZY or CRISP
+                    params = new Params( path, "FUZZY-ATTRIBUTES", "test","normal","search_heuristic_rules_smap_2");//FUZZY or CRISP
                     ArrayList<Architecture> init_pop = ArchitectureGenerator.getInstance().getInitialPopulation(POP_SIZE);
                     //ArrayList<Architecture> init_pop = RM.loadResultCollectionFromFile(Params.initial_pop).getPopulation();
                     AE.clear();
@@ -149,7 +151,7 @@ public class RBSAEOSSSMAP {
                 System.out.println("DONE");
                 break;
             case 6://Update capabilities file
-                params = new Params( path, "CRISP-ATTRIBUTES", "test","update_capabilities",search_clps);//FUZZY or CRISP
+                params = new Params( path, "FUZZY-ATTRIBUTES", "test","update_capabilities",search_clps);//FUZZY or CRISP
                 AE.init(8);
                 AE.precomputeCapabilities();                
                 try{
