@@ -25,6 +25,7 @@ import rbsa.eoss.SearchPerformanceComparator;
 import java.util.HashMap;
 import rbsa.eoss.NDSM;
 import rbsa.eoss.SearchPerformanceManager;
+import rbsa.eoss.local.Params;
 //import rbsa.eoss.DSM;
 /**
  *
@@ -41,7 +42,7 @@ public class RBSAEOSSSMAP {
         //String path  = "C:\\Users\\DS925\\Documents\\GitHub\\RBES_EOSS";//RBES SMAP for IEEEAero14 code
         String path  = "C:\\Users\\Ana-Dani\\Documents\\GitHub\\RBES_EOSS";
         
-        int MODE = 1;
+        int MODE = 3;
         ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
         ArchTradespaceExplorer ATE = ArchTradespaceExplorer.getInstance();
         ResultManager RM = ResultManager.getInstance();
@@ -51,22 +52,22 @@ public class RBSAEOSSSMAP {
             case 1: //1 arch
                 params = new Params( path, "FUZZY-ATTRIBUTES", "test","normal",search_clps);//FUZZY or CRISP
                 AE.init(1);
-                //Architecture arch = ArchitectureGenerator.getInstance().getMaxArch();
-                Architecture arch = ArchitectureGenerator.getInstance().getTestArch();
+                Architecture arch = ArchitectureGenerator.getInstance().getMaxArch();
+                //Architecture arch = ArchitectureGenerator.getInstance().getTestArch();
                 Result result1 = AE.evaluateArchitecture(arch,"Fast");
                 //System.out.println("NOSYN. Arch " + arch.toBitString() + "=> science = " + result1.getScience() + " cost = " + result1.getCost());
                 Architecture arch2 = ArchitectureGenerator.getInstance().getTestArch2();
-                Result result2 = AE.evaluateArchitecture(arch2,"Slow");
+                Result result2 = AE.evaluateArchitecture(arch2,"Fast");
                 //System.out.println("SYN. Arch " + arch.toBitString() + "=> science = " + result2.getScience() + " cost = " + result2.getCost());
                 RM.saveResultCollection(new ResultCollection(AE.getResults()));
                 System.out.println("DONE");
                 break;
             case 2://Full factorial 7 CPUS with random population
                 params = new Params( path, "FUZZY-ATTRIBUTES", "test","normal",search_clps);//FUZZY or CRISP
-                ArrayList<Architecture> population = ArchitectureGenerator.getInstance().generateRandomPopulation( 50 );
-                AE.init(7);
+                ArrayList<Architecture> population = ArchitectureGenerator.getInstance().getManualArchitectures();
+                AE.init(1);
                 AE.setPopulation( population );
-                AE.evalMinMax();
+                //AE.evalMinMax();
                 AE.evaluatePopulation();  
                 ResultCollection rc = new ResultCollection(AE.getResults());
                 RM.saveResultCollection(rc);
@@ -75,11 +76,15 @@ public class RBSAEOSSSMAP {
             case 3://Search
                 int POP_SIZE = 200;
                 int MAX_SEARCH_ITS = 5;
-                
+                params = new Params( path, "FUZZY-ATTRIBUTES", "test","normal","search_heuristic_rules_smap_127");
+                ResultCollection c = null;
+                ArrayList<Architecture> init_pop = ArchitectureGenerator.getInstance().getInitialPopulation(POP_SIZE);
                 for (int i = 0;i<20;i++) {
-                    params = new Params( path, "FUZZY-ATTRIBUTES", "test","normal","search_heuristic_rules_smap_2");//FUZZY or CRISP
-                    ArrayList<Architecture> init_pop = ArchitectureGenerator.getInstance().getInitialPopulation(POP_SIZE);
-                    //ArrayList<Architecture> init_pop = RM.loadResultCollectionFromFile(Params.initial_pop).getPopulation();
+                    if (i>0) {
+                        params = new Params( path, "FUZZY-ATTRIBUTES", "test","normal","search_heuristic_rules_smap_127");//FUZZY or CRISP
+                        if (init_pop != null)
+                            init_pop = c.getPopulation();
+                    }
                     AE.clear();
                     AE.init(8);
                     AE.evalMinMax();
@@ -87,8 +92,7 @@ public class RBSAEOSSSMAP {
                     ATE.setTerm_crit(new SearchOptions(POP_SIZE,MAX_SEARCH_ITS,0.5,0.1,0.5,init_pop));
                     ATE.search_NSGA2();
                     System.out.println("PERF: " + ATE.getSp().toString());
-                    ResultCollection c = new ResultCollection(AE.getResults());//
-                    init_pop = c.getPopulation();
+                    c =  new ResultCollection(AE.getResults());//
                     RM.saveResultCollection(c);
                 }
                 
@@ -129,7 +133,7 @@ public class RBSAEOSSSMAP {
                 System.out.println("DONE");
                 break;
             case 5://Update DSMs
-                params = new Params( path, "CRISP-ATTRIBUTES", "test","update_dsms",search_clps);//FUZZY or CRISP
+                params = new Params( path, "FUZZY-ATTRIBUTES", "test","update_dsms",search_clps);//FUZZY or CRISP
                 AE.init(6);
                 //AE.recomputeAllDSM();
                 AE.recomputeNDSM(2);
@@ -168,7 +172,7 @@ public class RBSAEOSSSMAP {
                 System.out.println("DONE");
                 break;
              case 7://Update scores file
-                params = new Params( path, "CRISP-ATTRIBUTES", "test","update_scores",search_clps);//FUZZY or CRISP
+                params = new Params( path, "FUZZY-ATTRIBUTES", "test","update_scores",search_clps);//FUZZY or CRISP
                 AE.init(6);
                 AE.recomputeScores(1);
                 AE.clearResults();
@@ -241,10 +245,10 @@ public class RBSAEOSSSMAP {
                 System.out.println("DONE");
                 break;
             case 9://local search
-                params = new Params( path, "CRISP-ATTRIBUTES", "test","update_scores","");//FUZZY or CRISP
+                params = new Params( path, "FUZZY-ATTRIBUTES", "test","normal","search_heuristic_rules_smap_2");
                 ArrayList<Architecture> init_popu = ResultManager.getInstance().loadResultCollectionFromFile(Params.initial_pop).getPopulation();
                 AE.setPopulation(ArchitectureGenerator.getInstance().localSearch(init_popu));
-                AE.init(7);
+                AE.init(8);
                 AE.evalMinMax();
                 AE.evaluatePopulation();
                 RM.saveResultCollection(new ResultCollection(AE.getResults()));

@@ -547,10 +547,16 @@ public class GenericTask implements Callable {
             r.setFocus( "FUZZY" );
             r.run();
             
-            r.setFocus( "REQUIREMENTS" );
+            if ((Params.req_mode.equalsIgnoreCase("FUZZY-CASES")) || (Params.req_mode.equalsIgnoreCase("FUZZY-ATTRIBUTES")))
+                r.setFocus( "FUZZY-REQUIREMENTS" );
+            else
+                r.setFocus( "REQUIREMENTS" );
             r.run();
             
-            r.setFocus( "AGGREGATION" );
+            if ((Params.req_mode.equalsIgnoreCase("FUZZY-CASES")) || (Params.req_mode.equalsIgnoreCase("FUZZY-ATTRIBUTES")))
+                r.setFocus( "FUZZY-AGGREGATION" );
+            else
+                r.setFocus( "AGGREGATION" );
             r.run();
             
             if ((Params.req_mode.equalsIgnoreCase("CRISP-ATTRIBUTES")) || (Params.req_mode.equalsIgnoreCase("FUZZY-ATTRIBUTES"))) {

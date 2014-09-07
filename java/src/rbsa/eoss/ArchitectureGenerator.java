@@ -146,6 +146,7 @@ public class ArchitectureGenerator {
         ArrayList<Architecture> pop2  = new ArrayList<Architecture>();
         int nvars = pop1.get(0).getBitString().length;
         for (Architecture arch:pop1) {
+            pop2.add(arch);
             Architecture newarch;
             if (arch.getNsats()>1) {
                 newarch = new Architecture(arch.getBitString(),Params.norb,Params.ninstr,arch.getNsats()-1);
@@ -168,7 +169,8 @@ public class ArchitectureGenerator {
                     arch[j] = true;
                 }
                 Architecture new_one = new Architecture(arch,Params.norb,Params.ninstr,pop1.get(k).getNsats());
-                new_one.setEval_mode("DEBUG");
+                //new_one.setEval_mode("DEBUG");
+                pop2.add(new_one);
             }
         }
         
@@ -185,6 +187,7 @@ public class ArchitectureGenerator {
             if (UNIQUE)
                 pop3.add(arch1);
         }
+        System.out.println("New population has a size of " + pop3.size() + " archs");
         return pop3;
     }
     
@@ -218,6 +221,51 @@ public class ArchitectureGenerator {
         
         //Two copies of each instrument in the same orbits
         man_archs.add(new Architecture("111111111111111111111111000000000000000000000000000000000000",1));
+        
+        //Reference architecture #1
+        HashMap<String,String[]> map = new HashMap<String,String[]>();
+        String[] payl_polar = {""};map.put("LEO-600-polar-NA",payl_polar);
+        String[] payl_AM = {"HYSP_TIR"};map.put("SSO-600-SSO-AM",payl_AM);
+        String[] payl_600DD = {""};map.put("SSO-600-SSO-DD",payl_600DD);
+        String[] payl_PM = {"GACM_VIS","GACM_SWIR"};map.put("SSO-800-SSO-PM",payl_PM);
+        String[] payl_800DD = {""};map.put("SSO-800-SSO-DD",payl_800DD);
+        man_archs.add(new Architecture(map,1));
+        
+        //Reference architecture #2
+        HashMap<String,String[]> map2 = new HashMap<String,String[]>();
+        String[] payl2_polar = {""};map2.put("LEO-600-polar-NA",payl2_polar);
+        String[] payl2_AM = {"HYSP_TIR"};map2.put("SSO-600-SSO-AM",payl2_AM);
+        String[] payl2_600DD = {""};map2.put("SSO-600-SSO-DD",payl2_600DD);
+        String[] payl2_PM = {"GACM_VIS","GACM_SWIR","POSTEPS_IRS"};map2.put("SSO-800-SSO-PM",payl2_PM);
+        String[] payl2_800DD = {"DESD_SAR"};map2.put("SSO-800-SSO-DD",payl2_800DD);
+        man_archs.add(new Architecture(map2,1));
+        
+        //Reference architecture #3
+        HashMap<String,String[]> map3 = new HashMap<String,String[]>();
+        String[] payl3_polar = {"CLAR_ERB"};map3.put("LEO-600-polar-NA",payl3_polar);
+        String[] payl3_AM = {"HYSP_TIR","POSTEPS_IRS"};map3.put("SSO-600-SSO-AM",payl3_AM);
+        String[] payl3_600DD = {""};map3.put("SSO-600-SSO-DD",payl3_600DD);
+        String[] payl3_PM = {"GACM_VIS","GACM_SWIR","POSTEPS_IRS"};map3.put("SSO-800-SSO-PM",payl3_PM);
+        String[] payl3_800DD = {"DESD_SAR"};map3.put("SSO-800-SSO-DD",payl3_800DD);
+        man_archs.add(new Architecture(map3,1));
+        
+        //Reference architecture #4
+        HashMap<String,String[]> map4 = new HashMap<String,String[]>();
+        String[] payl4_polar = {"CLAR_ERB","CNES_KaRIN"};map4.put("LEO-600-polar-NA",payl4_polar);
+        String[] payl4_AM = {"HYSP_TIR","POSTEPS_IRS"};map4.put("SSO-600-SSO-AM",payl4_AM);
+        String[] payl4_600DD = {"DESD_LID"};map4.put("SSO-600-SSO-DD",payl4_600DD);
+        String[] payl4_PM = {"GACM_VIS","GACM_SWIR","POSTEPS_IRS"};map4.put("SSO-800-SSO-PM",payl4_PM);
+        String[] payl4_800DD = {"DESD_SAR"};map4.put("SSO-800-SSO-DD",payl4_800DD);
+        man_archs.add(new Architecture(map4,1));
+        
+        //Reference architecture #5
+        HashMap<String,String[]> map5 = new HashMap<String,String[]>();
+        String[] payl5_polar = {"CLAR_ERB","CNES_KaRIN","ACE_POL","ACE_ORCA"};map5.put("LEO-600-polar-NA",payl5_polar);
+        String[] payl5_AM = {"HYSP_TIR","POSTEPS_IRS","ACE_LID"};map5.put("SSO-600-SSO-AM",payl5_AM);
+        String[] payl5_600DD = {"DESD_LID"};map5.put("SSO-600-SSO-DD",payl5_600DD);
+        String[] payl5_PM = {"GACM_VIS","GACM_SWIR","POSTEPS_IRS"};map5.put("SSO-800-SSO-PM",payl5_PM);
+        String[] payl5_800DD = {"DESD_SAR"};map5.put("SSO-800-SSO-DD",payl5_800DD);
+        man_archs.add(new Architecture(map5,1));
         return man_archs;
     }
     
@@ -235,13 +283,15 @@ public class ArchitectureGenerator {
     public Architecture getTestArch() { // SMAP 2 SSO orbits, 2 sats per orbit
         //Architecture arch = new Architecture("0011000000111110000000000",1);
         //Architecture arch = new Architecture("01000010000100001000010000100001000010000100001000010000100001000",1);
-        Architecture arch = new Architecture("100001000011001010111100001001001010101010110001100000110100",1);
+        Architecture arch = new Architecture("00100000000000000000000000000000000000000000000000000000100000000",1);
+        //String[] payl = {"POSTEPS_IRS"};
+        //Architecture arch = new Architecture(payl,"SSO-800-SSO-PM");
         arch.setEval_mode("DEBUG");
         return arch;//{"SMAP_RAD","SMAP_MWR","CMIS","VIIRS","BIOMASS"};{"600polar","600AM","600DD","800AM","800PM"};
     }
     public Architecture getTestArch2() {
-        String[] payl = {"DESD_LID","DESD_SAR"};
-        Architecture arch = new Architecture(payl,"SSO-600-SSO-DD");
+        String[] payl = {"GACM_SWIR","ACE_LID"};
+        Architecture arch = new Architecture(payl,"SSO-800-SSO-PM");//LEO-600-polar-NA
         arch.setEval_mode("DEBUG");
         return arch;
     }

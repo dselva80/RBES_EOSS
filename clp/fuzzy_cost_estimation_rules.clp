@@ -12,10 +12,7 @@
     )
 
 
-(deffunction apply-NICM (?instr)
-    (bind ?m (get-instrument-mass ?instr))
-    (bind ?p (get-instrument-power ?instr))
-    (bind ?rb (get-instrument-datarate ?instr))
+(deffunction apply-NICM (?m ?p ?rb)
     
     (bind ?cost (* 25600 (** (/ ?p 61.5) 0.32) (** (/ ?m 53.8) 0.26) 
             (** (/ (* 1000 ?rb) 40.4) 0.11))); in FY04$
@@ -23,21 +20,43 @@
     ;(printout t apply-NICM " " ?instr " = " ?m " " ?p " " ?rb " " ?cost crlf)
     (return ?cost)
     )
+	
+;(deffunction apply-NICM (?instr)
+;    (bind ?m (get-instrument-mass ?instr))
+;    (bind ?p (get-instrument-power ?instr))
+;    (bind ?rb (get-instrument-datarate ?instr))
+;    
+;    (bind ?cost (* 25600 (** (/ ?p 61.5) 0.32) (** (/ ?m 53.8) 0.26) 
+;            (** (/ (* 1000 ?rb) 40.4) 0.11))); in FY04$
+;    (bind ?cost (/ ?cost 1.097))
+;    ;(printout t apply-NICM " " ?instr " = " ?m " " ?p " " ?rb " " ?cost crlf)
+;    (return ?cost)
+;    )
+
+;(defrule FUZZY-COST-ESTIMATION::estimate-instrument-cost
+;    "This rule estimates payload cost using a very simplified version of the 
+;    NASA Instrument Cost Model available on-line"
+;    (declare (salience 25) (no-loop TRUE))
+;    ?instr <- (DATABASE::Instrument (cost# nil) (Name ?name) 
+;        (developed-by ?whom)
+;        )
+;    =>  
+;    (bind ?c0 (apply-NICM ?name)) 
+;    (if (is-domestic ?whom) then (modify ?instr (cost (cost-fv ?c0 39.0)) (cost# ?c0)) 
+;        else (modify ?instr (cost# 0) (cost (cost-fv 0 0))))
+;    )
 
 (defrule FUZZY-COST-ESTIMATION::estimate-instrument-cost
     "This rule estimates payload cost using a very simplified version of the 
     NASA Instrument Cost Model available on-line"
     (declare (salience 25) (no-loop TRUE))
-    ?instr <- (DATABASE::Instrument (cost# nil) (Name ?name) 
-        (developed-by ?whom)
-        )
+    ?instr <- (CAPABILITIES::Manifested-instrument (cost# nil) (mass# ?m&~nil) (average-power# ?p&~nil) (average-data-rate# ?rb&~nil)
+        (developed-by ?whom))
     =>  
-    (bind ?c0 (apply-NICM ?name)) 
+    (bind ?c0 (apply-NICM ?m ?p ?rb)) 
     (if (is-domestic ?whom) then (modify ?instr (cost (cost-fv ?c0 39.0)) (cost# ?c0)) 
         else (modify ?instr (cost# 0) (cost (cost-fv 0 0))))
     )
-
-
 
 (defrule FUZZY-COST-ESTIMATION::estimate-payload-cost2
     "This rule estimates payload cost using a very simplified version of the 
@@ -46,8 +65,8 @@
     ?miss <- (MANIFEST::Mission (payload-cost# nil) (instruments $?payload)
         )
     =>
-    (bind ?costs (map get-instrument-cost ?payload)); in FY04$
-    (bind ?fuzzy-costs (map get-instrument-fuzzy-cost ?payload)); in FY04$
+    (bind ?costs (map get-instrument-cost-manifest ?payload)); in FY04$
+    (bind ?fuzzy-costs (map get-instrument-fuzzy-cost-manifest ?payload)); in FY04$
     ;(printout t "estimate payload cost: instrument costs = " ?costs crlf)
     (bind ?cost (sum$ ?costs)); correct for inflation from FY04 to FY00, from http://oregonstate.edu/cla/polisci/faculty-research/sahr/cv2000.pdf
     (bind ?fuzzy-cost (fuzzysum$ ?fuzzy-costs)); correct for inflation from FY04 to FY00, from http://oregonstate.edu/cla/polisci/faculty-research/sahr/cv2000.pdf

@@ -148,12 +148,12 @@ public class Params {
         this.name = name;
         this.run_mode = run_mode;
         path_save_results = path + "\\results";
-        capability_dat_file = path + "\\dat\\capabilities2014-09-03-02-29-29.dat";//capabilities2014-08-29-14-44-57
+        capability_dat_file = path + "\\dat\\capabilities2014-09-04-18-28-40.dat";//capabilities2014-09-03-02-29-29
         revtimes_dat_file = path + "\\dat\\climate-centric revtimes.dat";
-        dsm_dat_file = path + "\\dat\\all_dsms.dat";
-        scores_dat_file = path  + "\\dat\\scores.dat";
-        //initial_pop = path + "\\results\\2014-09-02_10-07-05_test.rs";//2014-05-31_20-20-23_test
-        initial_pop = "";
+        dsm_dat_file = path + "\\dat\\all_dsms2014-09-06-14-37-56.dat";
+        scores_dat_file = path  + "\\dat\\scores2014-09-06-12-57-04.dat";
+        initial_pop = path + "\\results\\2014-09-07_17-35-15_test.rs";//2014-05-31_20-20-23_test
+        //initial_pop = "";
         // Paths for common xls files
         /*template_definition_xls = path + "\\xls\\AttributeSet.xls";//used
         mission_analysis_database_xls = path + "\\xls\\Mission Analysis Database.xls";//used
@@ -206,7 +206,7 @@ public class Params {
             search_heuristic_rules_clp   = path + "\\clp\\" + search_clp + ".clp";
         
         down_selection_rules_clp     = path + "\\clp\\down_selection_rules_smap.clp";
-        adhoc_rules_clp              = path + "\\clp\\smap_rules_test.clp";
+        adhoc_rules_clp              = path + "\\clp\\climate_centric_rules.clp";
       
         // Metrics for utility and pareto calculations
         pareto_metrics = new ArrayList<String>();

@@ -41,6 +41,8 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
     private String crossover;
     private Nto1pair nto1pair;
     private String improve;
+    private String heuristics_to_apply;
+    private String heuristics_applied;
     private String id;
     private int nsats;
     
@@ -62,21 +64,30 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         mutate = "no";
         crossover = "no";
         improve = "no";
+        heuristics_to_apply = "";
+        heuristics_applied = "";
         id = UUID.randomUUID().toString();
     }
     public Architecture(Fact f) {
         Resource res = ArchitectureEvaluator.getInstance().getResourcePool().getResource();
+        Rete r = res.getRete();
         Context c = res.getRete().getGlobalContext();
         String bs = null;
         String _mutate = null;
         String _crossover = null;
         String _improve = null;
+        ArrayList<String> _heuristics_to_apply = null;
+        ArrayList<String> _heuristics_applied = null;
         try {
             bs = f.getSlotValue("bitString").stringValue(c);
             nsats = f.getSlotValue("num-sats-per-plane").intValue(c);
             _mutate = f.getSlotValue("mutate").stringValue(c);
             _crossover = f.getSlotValue("crossover").stringValue(c);
             _improve = f.getSlotValue("improve").stringValue(c);
+            ValueVector vv = (ValueVector)f.getSlotValue("heuristics-to-apply").listValue(c);
+            _heuristics_to_apply = res.getM().JessList2ArrayList(vv, r);
+            vv = (ValueVector)f.getSlotValue("heuristics-applied").listValue(c);
+            _heuristics_applied = res.getM().JessList2ArrayList(vv, r);
             ArchitectureEvaluator.getInstance().getResourcePool().freeResource(res);
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -97,6 +108,10 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         mutate = _mutate;
         crossover = _crossover;
         improve = _improve;
+        if(_heuristics_to_apply != null)
+            heuristics_to_apply = res.getM().StringArraytoStringWithSpaces((String[])(_heuristics_to_apply.toArray()));
+        if(_heuristics_applied != null)
+            heuristics_applied = res.getM().StringArraytoStringWithSpaces((String[])(_heuristics_applied.toArray()));
         id = UUID.randomUUID().toString();
     }//BooleanString2Matrix
     public Architecture(String bs, int nsat) {
@@ -116,6 +131,8 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         mutate = "no";
         crossover = "no";
         improve = "no";
+        heuristics_to_apply = "";
+        heuristics_applied = "";
         id = UUID.randomUUID().toString();
     }//BooleanString2Matrix
     public Architecture(boolean[][] mat, int nsat) {
@@ -135,6 +152,8 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         mutate = "no";
         crossover = "no";
         improve = "no";
+        heuristics_to_apply = "";
+        heuristics_applied = "";
         id = UUID.randomUUID().toString();
     }
     public Architecture(String[] payload, String orbit) {
@@ -164,6 +183,8 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         mutate = "no";
         crossover = "no";
         improve = "no";
+        heuristics_to_apply = "";
+        heuristics_applied = "";
         id = UUID.randomUUID().toString();
         nsats = 1;
     }
@@ -202,7 +223,10 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         mutate = "no";
         crossover = "no";
         improve = "no";
+        heuristics_to_apply = "";
+        heuristics_applied = "";
         id = UUID.randomUUID().toString();
+        nsats = 1;
     }
     public Architecture(ICombinatoricsVector<String> payl, String orbit) {
         int n = payl.getSize();
@@ -236,7 +260,10 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         mutate = "no";
         crossover = "no";
         improve = "no";
+        heuristics_to_apply = "";
+        heuristics_applied = "";
         id = UUID.randomUUID().toString();
+        nsats = 1;
     }
     public Architecture(HashMap<String,String[]> mapping, int nsat) {
         mat = new boolean[Params.norb][Params.ninstr];
@@ -273,6 +300,8 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         mutate = "no";
         crossover = "no";
         improve = "no";
+        heuristics_to_apply = "";
+        heuristics_applied = "";
         id = UUID.randomUUID().toString();
     }
     
@@ -374,6 +403,22 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         this.norb = norb;
     }
 
+    public String getHeuristics_to_apply() {
+        return heuristics_to_apply;
+    }
+
+    public void setHeuristics_to_apply(String heuristics_to_apply) {
+        this.heuristics_to_apply = heuristics_to_apply;
+    }
+
+    public String getHeuristics_applied() {
+        return heuristics_applied;
+    }
+
+    public void setHeuristics_applied(String heuristics_applied) {
+        this.heuristics_applied = heuristics_applied;
+    }
+
     //toString
     @Override
     public String toString() {
@@ -392,7 +437,7 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
     public String toFactString() {
         
         String ret =  "(MANIFEST::ARCHITECTURE" + " (id " + id + ") (num-sats-per-plane " + nsats + ") (bitString " + toBitString() + ") (payload " + payload + ") (orbit " + orbit + ")"
-                + " (mutate " + mutate + " ) (crossover " + crossover + ") (improve " + improve + ")";
+                + " (mutate " + mutate + " ) (crossover " + crossover + ") (improve " + improve + ") (heuristics-to-apply " + heuristics_to_apply + " ) (heuristics-applied " + heuristics_applied + ") ";
         if(result != null) {
             ret = ret + " (benefit " + result.getScience() + " ) (lifecycle-cost " + result.getCost() + ")" + " (pareto-ranking " + result.getParetoRanking() + " ) (utility " + result.getUtility() + ")";
         }

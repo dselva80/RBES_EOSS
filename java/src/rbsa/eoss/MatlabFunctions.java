@@ -38,16 +38,16 @@ public class MatlabFunctions implements Userfunction {
         value_inv_hashmap = new HashMap<String,Interval>(5);
         value_inv_hashmap.put("Full",new Interval("interval",1.0,1.0));
         value_inv_hashmap.put("Most",new Interval("interval",0.66,1.0));
-        value_inv_hashmap.put("Half",new Interval("interval",0.4,0.6));
-        value_inv_hashmap.put("Some",new Interval("interval",0.33,0.5));
+        //value_inv_hashmap.put("Half",new Interval("interval",0.4,0.6));
+        value_inv_hashmap.put("Some",new Interval("interval",0.33,0.66));
         value_inv_hashmap.put("Marginal",new Interval("interval",0.0,0.33));
         vvalue_inv_hashmap = new Value(value_inv_hashmap);
         
         value_hashmap = new HashMap<Interval,String>(5);
         value_hashmap.put(new Interval("interval",1.0,1.0),"Full");
         value_hashmap.put(new Interval("interval",0.66,1.0),"Most");
-        value_hashmap.put(new Interval("interval",0.4,0.6),"Half");
-        value_hashmap.put(new Interval("interval",0.33,0.5),"Some");
+        //value_hashmap.put(new Interval("interval",0.4,0.6),"Half");
+        value_hashmap.put(new Interval("interval",0.33,0.66),"Some");
         value_hashmap.put(new Interval("interval",0.0,0.33),"Marginal");
         vvalue_hashmap = new Value(value_hashmap);
         

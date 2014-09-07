@@ -6,7 +6,6 @@
 ;; ***************************
 
 
-
 (defrule CAPABILITIES::passive-optical-instruments-cannot-measure-in-dark
     "Passive optical instruments cannot take their measurements in DD RAANs"
     (declare (salience 10))
@@ -118,7 +117,7 @@
 ;    (modify ?instr (avg-revisit-time-global# ?revtime-global) (avg-revisit-time-tropics# ?revtime-tropics) (avg-revisit-time-northern-hemisphere# ?revtime-NH) (avg-revisit-time-southern-hemisphere# ?revtime-SH) (avg-revisit-time-cold-regions# ?revtime-cold) (avg-revisit-time-US# ?revtime-US))
 ;    )
 
-(defrule CAPABILITIES::cryospheric-instruments-want-non-polar-orbits
+(defrule CAPABILITIES::cryospheric-instruments-want-polar-orbits
     "If a cryospheric instrument is flown on a non polar orbit then 
     it loses coverage of the polar regions"
     
@@ -127,7 +126,7 @@
     (DATABASE::Instrument (Name ?ins) (Concept ?co))
     (test (neq (str-index "Primary application: ice" ?co) FALSE))
     =>
-    ;(printout t cryospheric-instruments-want-non-polar-orbits crlf)
+    ;(printout t cryospheric-instruments-want-polar-orbits crlf)
     (modify ?c (can-take-measurements no) (reason "If a cryospheric instrument is flown on a non polar orbit then 
     it loses coverage of the polar regions"))
     )

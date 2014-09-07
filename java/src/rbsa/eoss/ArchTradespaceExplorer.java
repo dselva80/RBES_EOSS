@@ -66,8 +66,8 @@ public class ArchTradespaceExplorer {
             //extend population using search rules
             System.out.println("Evaluating...");
             long t0 = System.currentTimeMillis();
-            extendPopulation();
-            
+            //extendPopulation();
+            extendPopulationWithCooperation();
             //evaluate extended population
             ArchEval.clearResults();
             ArchEval.setPopulation(current_population);
@@ -171,7 +171,7 @@ public class ArchTradespaceExplorer {
                 if (list!=null) {
                     n++;
                     if(n==list.size())
-                    n = 0;
+                        n = 0;
                 }
 
             }
@@ -185,6 +185,62 @@ public class ArchTradespaceExplorer {
                 r.run();
                 //r.eval("(unwatch all)");
                 current_population = retrieveArchs(res);
+            } catch (Exception e) {
+                System.out.println("EXC in ArchTradespaceExplorer:generateNextPopulation: " + e.getClass() + " " + e.getMessage());
+                e.printStackTrace();
+                ArchitectureEvaluator.getInstance().freeSearchResource();
+            }
+            ArchitectureEvaluator.getInstance().freeSearchResource();
+        } else {
+            current_population.addAll(ArchitectureGenerator.getInstance().generateRandomPopulation(term_crit.getPopulation_size()));
+        }
+    }
+    public void extendPopulationWithCooperation() {
+        if(nits>0) {
+            //Mark small fraction for random mutation
+            for (int i = 0;i<current_population.size();i++) {
+                if(rnd.nextDouble() < term_crit.getMutation_rate()) 
+                    current_population.get(i).setMutate("yes");
+            }
+
+            Collections.shuffle(current_population);
+            Resource res = ArchitectureEvaluator.getInstance().getSearchResource();
+            Rete r = res.getRete();
+            String str_list = "";
+            try {
+                r.setFocus("DATABASE");
+                r.run();
+                ArrayList<Fact> ff = res.getQueryBuilder().makeQuery("SEARCH-HEURISTICS::list-improve-heuristics");
+                Fact f = ff.get(0);
+                ValueVector vv = f.getSlotValue("list").listValue(r.getGlobalContext());
+                ArrayList<String> list = res.getM().JessList2ArrayList(vv, r);
+                for (String heur:list)
+                    str_list = str_list + " " + heur;//Initial extra space is irrelevant
+            } catch (Exception e) {
+                System.out.println("EXC in ArchTradespaceExplorer:extendPopulation: " + e.getClass() + " " + e.getMessage());
+                e.printStackTrace();
+                ArchitectureEvaluator.getInstance().freeSearchResource();
+            }
+            String impr;
+            for (long i = 0;i<current_population.size();i++) {
+                if (str_list.isEmpty())
+                    impr = "crossover1point";
+                else
+                    impr = str_list;
+                //current_population.get((int)i).setImprove(impr);
+                current_population.get((int)i).setHeuristics_to_apply(impr);
+            }
+
+            //Apply heuristics, this needs to keep original architectures and produce new ones.
+            
+            try {
+                assertArchs(res,current_population);
+                //r.eval("(watch rules)");r.eval("(watch facts)");
+                r.eval("(focus SEARCH-HEURISTICS)");
+                r.run();
+                //r.eval("(unwatch all)");
+                current_population = retrieveArchs(res);
+                System.out.println("Population size after expansion is " + current_population.size());
             } catch (Exception e) {
                 System.out.println("EXC in ArchTradespaceExplorer:generateNextPopulation: " + e.getClass() + " " + e.getMessage());
                 e.printStackTrace();
@@ -299,8 +355,9 @@ public class ArchTradespaceExplorer {
         if(!compute_all_fronts)
             return fronts;
         int i = 1;
-        while(!fronts.get(i).isEmpty()) {
-            ArrayList<Architecture> nextFront = new ArrayList<Architecture>();
+        ArrayList<Architecture> nextFront = fronts.get(i);
+        while(!nextFront.isEmpty()) {
+            nextFront = new ArrayList<Architecture>();
             for (int j = 0;j<fronts.get(i).size();j++) {//iterate over archs of front i
                 Architecture a1 = fronts.get(i).get(j);//arch j of front i
                 ArrayList<Integer> doms = dominates.get(a1);//set of solutions dominated by a1
@@ -316,7 +373,8 @@ public class ArchTradespaceExplorer {
                 }
             }
             i++;
-            fronts.put(i,nextFront);
+            if (!nextFront.isEmpty())
+                fronts.put(i,nextFront);
         }
         return fronts;
     }
