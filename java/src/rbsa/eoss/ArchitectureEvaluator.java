@@ -385,7 +385,7 @@ public class ArchitectureEvaluator {
     {
         //ArrayList<Result> results = new ArrayList<Result>();
         for( int i = 0; i < population.size(); i++ ) {
-            GenericTask t = new GenericTask( population.get(i) , "Fast");
+            GenericTask t = new GenericTask( population.get(i) , "Slow");
             //tpe.execute(t);
             futures.add(tpe.submit(t));
             
@@ -420,12 +420,12 @@ public class ArchitectureEvaluator {
     public void evalMinMax() {
        
         Architecture max_arch = ArchitectureGenerator.getInstance().getMaxArch2();
-        Result r2 = evaluateArchitecture(max_arch,"Fast");
+        Result r2 = evaluateArchitecture(max_arch,"Slow");
         Params.max_science = r2.getScience();
         Params.max_cost = r2.getCost();
         
         Architecture min_arch = ArchitectureGenerator.getInstance().getMinArch();
-        Result r1 = evaluateArchitecture(min_arch,"Fast");
+        Result r1 = evaluateArchitecture(min_arch,"Slow");
         Params.min_science = r1.getScience();
         Params.min_cost = r1.getCost();
         

@@ -148,11 +148,11 @@ public class Params {
         this.name = name;
         this.run_mode = run_mode;
         path_save_results = path + "\\results";
-        capability_dat_file = path + "\\dat\\capabilities2014-09-04-18-28-40.dat";//capabilities2014-09-03-02-29-29
+        capability_dat_file = path + "\\dat\\capabilities.dat";//capabilities2014-09-09-02-33-13.
         revtimes_dat_file = path + "\\dat\\climate-centric revtimes.dat";
-        dsm_dat_file = path + "\\dat\\all_dsms2014-09-06-14-37-56.dat";
-        scores_dat_file = path  + "\\dat\\scores2014-09-06-12-57-04.dat";
-        initial_pop = path + "\\results\\2014-09-07_17-35-15_test.rs";//2014-05-31_20-20-23_test
+        dsm_dat_file = path + "\\dat\\all_dsms2014-09-09-09-43-48.dat";
+        scores_dat_file = path  + "\\dat\\scores2014-09-09-08-24-31.dat";
+        initial_pop = path + "\\results\\2014-09-08_15-51-32_test.rs";//2014-05-31_20-20-23_test
         //initial_pop = "";
         // Paths for common xls files
         /*template_definition_xls = path + "\\xls\\AttributeSet.xls";//used

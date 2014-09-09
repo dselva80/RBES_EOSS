@@ -71,7 +71,8 @@ function GUI_explanation_facility_OpeningFcn(hObject, eventdata, handles, vararg
     javaaddpath('./java/combinatoricslib-2.0.jar');
     javaaddpath('./java/commons-lang3-3.1.jar');
     javaaddpath('./java/matlabcontrol-4.0.0.jar');
-    javaaddpath( '.\java\RBES_Demo_May2014.jar' );
+    %javaaddpath( '.\java\RBES_Demo_May2014.jar' );
+    javaaddpath( '.\java\RBES_EOSS.jar' );
     import rbsa.eoss.*
     import rbsa.eoss.local.*
     import java.io.*;
@@ -169,7 +170,7 @@ end
 RBES_plot25( handles, handles.axes, archs, results, {x_var,y_var}, grp_fcn, pareto, fuzzy);
 
 function RBES_plot25(handles,ax,archs,results, inaxis,filter_func,PARETO, FUZZY)
-    
+    global ref_arch ref_label resCol
     cla(ax);
     if FUZZY
         narch = length(archs);
@@ -213,7 +214,7 @@ function RBES_plot25(handles,ax,archs,results, inaxis,filter_func,PARETO, FUZZY)
             yvals(i) = results.get(i-1).getCost;
         end
         if isempty(filter_func) || strcmp(filter_func,'') || strcmp(filter_func,' ')
-            labels = {'Architectures','Pareto Front'};
+            labels = {'Pareto Front','Architectures'};
             vals = ones(narch,1);
             labels_map = java.util.HashMap;
         else
@@ -230,6 +231,26 @@ function RBES_plot25(handles,ax,archs,results, inaxis,filter_func,PARETO, FUZZY)
         indexes = cell(n,1);
         markers = MARKERS(1:length(unique_vals));
         colors = COLORS(1:length(unique_vals));
+        
+        %plot reference architectures (search from back b/c ref archs inserted at back)
+        ref_colors = {'b','r','g','k','m'};
+        [a,b]=size(ref_arch);
+        for i = 1:b
+            for j = resCol.getResults.size-1:-1:0
+                if resCol.getResults.get(j).getArch.getId==ref_arch{i}.getId
+                    sci = resCol.getResults.get(j).getScience;
+                    cost = resCol.getResults.get(j).getCost;
+                    scatter(sci,cost,50,'Marker','h','MarkerEdgeColor',ref_colors{i},'MarkerFaceColor',ref_colors{i},'LineWidth',2,...
+                        'Parent',ax);
+                    hold on
+                    break;
+                end
+            end
+        end
+        legend(ref_label,'Location','Best');
+        labels = [ref_label labels];
+        
+        
         if PARETO
             [x_pareto, y_pareto, inds, ~ ] = pareto_front([xvals yvals] , {'LIB', 'SIB'});
             set( handles.num_archs_pf,'String', num2str(length(inds)) );
@@ -240,7 +261,7 @@ function RBES_plot25(handles,ax,archs,results, inaxis,filter_func,PARETO, FUZZY)
         ylim( [0 Inf] );
         for i = 1 : n
             indexes{i} = (vals == unique_vals(i));
-            labels = [labels;labels_map.get(unique_vals(i))]; 
+            labels = [labels, labels_map.get(unique_vals(i))]; 
             scatter(xvals(indexes{i}),yvals(indexes{i}),'Marker',markers{i},'MarkerEdgeColor',colors{i},...
                     'Parent',ax,'ButtonDownFcn', {@axes_ButtonDownFcn,archs(indexes{i}),xvals(indexes{i}),yvals(indexes{i}),handles});
 
@@ -358,6 +379,7 @@ print_figure(archs,results, {x_var,y_var},xlim,ylim,grp_fcn,pareto);
 
 
 function print_figure(archs,results, inaxis,xlim,ylim,filter_func,PARETO)
+global ref_arch ref_label resCol
 fs = 10;
 ms = 80;
 f = figure;
@@ -454,13 +476,36 @@ n = length(unique_vals);
 indexes = cell(n,1);
 markers = MARKERS(1:length(unique_vals));
 colors = COLORS(1:length(unique_vals));
+
+%plot reference architectures (search from back b/c ref archs inserted at back)
+ref_colors = {'b','r','g','k','m'};
+[a,b]=size(ref_arch);
+for i = 1:b
+    for j = resCol.getResults.size-1:-1:0
+        if resCol.getResults.get(j).getArch.getId==ref_arch{i}.getId
+            sci = resCol.getResults.get(j).getScience;
+            cost = resCol.getResults.get(j).getCost;
+            scatter(sci,cost,50,'Marker','h','MarkerEdgeColor',ref_colors{i},'MarkerFaceColor',ref_colors{i},'LineWidth',2,...
+                'Parent',ax);
+            hold on
+            break;
+        end
+    end
+end
+legend(ref_label,'Location','Best');
+labels = [ref_label labels];
+        
  if PARETO
     [x_pareto, y_pareto, inds, ~ ] = pareto_front([xvals yvals] , {'LIB', 'SIB'});
     plot( x_pareto, y_pareto, 'r--','Parent',ax);
  end
 hold on;
 for i = 1 : n
-    labels = [labels;labels_map.get(unique_vals(i))]; 
+    if isempty(filter_func) || strcmp(filter_func,'') || strcmp(filter_func,' ')
+    else
+        labels = [labels,labels_map.get(unique_vals(i))]; 
+    end
+    
     indexes{i} = (vals == unique_vals(i));
     scatter(xvals(indexes{i}),yvals(indexes{i}),ms,'Marker',markers{i},'MarkerEdgeColor',colors{i},...
         'Parent',ax);
@@ -707,6 +752,7 @@ global r;
 global qb;
 global hm;
 % global AE;
+global ref_arch ref_label
 
 %clearvars -global results architecture resCol x y
 
@@ -715,6 +761,7 @@ global hm;
 resMngr = rbsa.eoss.ResultManager.getInstance();
 resCol = resMngr.loadResultCollectionFromFile( [PathName FileName] );
 results = resCol.getResults;
+[ref_arch,ref_label]=setReferenceArchs();
 
 
 set( handles.txtFilePath, 'String', FileName );
